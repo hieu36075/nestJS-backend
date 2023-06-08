@@ -1,0 +1,59 @@
+version: '3.9'
+
+networks:
+  backend:
+
+services:
+  nest-service:
+    container_name: nest-service
+    build:
+      dockerfile: Dockerfile
+      context: .
+    env_file:
+    - .env
+    environment:
+      DATABASE_URL: 'postgresql://postgres:123456@postgres:5432/test'
+    ports:
+      - '3500:3500'
+    depends_on:
+      - redis-cache
+      - postgres
+    networks:
+     - backend
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - '44072:5432'
+    networks:
+     - backend
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: raj@nola.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+     - backend
+
+
+
+  redis-cache:
+    image: redis:latest
+    ports:
+      - 6379:6379
+
+
+volumes:
+  local_pgdata:
+  pgadmin-data:   
