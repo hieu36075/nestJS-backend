@@ -2,11 +2,10 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
-import { MyJwtGuard } from 'src/auth/guard';
-import { RolesGuard } from 'src/auth/guard/roles.guard';
-import { Roles } from 'src/auth/decorator';
-import { Role } from 'src/auth/role.enum';
-import { GetUser } from 'src/auth/decorator/user.decorator';
+import { MyJwtGuard } from 'src/common/guard';
+import { RolesGuard } from 'src/common/guard/roles.guard';
+import { Roles } from 'src/common/decorator';
+import { GetUser } from 'src/common/decorator/user.decorator';
 import { CreatePostDTO } from './dto/create.note.dto';
 import { UpdatePostDTO } from './dto';
 import { CacheInterceptor  } from '@nestjs/cache-manager';

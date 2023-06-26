@@ -1,19 +1,25 @@
-import { Controller, Post, Body, Get, UseGuards } from "@nestjs/common";
+import { Controller, Post, Body, Get, UseGuards, Query } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDTO } from "./dto";
 import { ApiBadRequestResponse, ApiCreatedResponse, ApiTags } from "@nestjs/swagger";
-import { MyJwtGuard } from "./guard";
+import { MyJwtGuard } from "src/common/guard";
+import { Role } from "@prisma/client";
+import { MailService } from "src/providers/mail/mail.service";
 @Controller('auth')
 @ApiTags('Auth')
 
 export class AuthController {
-    constructor(private authService : AuthService){
+    constructor(
+        
+        private authService : AuthService,
+       
+        ){
 
     }
 
     @Get('role')
-    getRole(){
-        return this.authService.viewRole();
+    async getRole() : Promise<Role[]>{
+        return await this.authService.viewRole();
     }
 
     @Post("register",) 
@@ -27,5 +33,9 @@ export class AuthController {
         return this.authService.login(authDTO);
     }
     
+    @Get('mail')
+    async sendMail(){
+        return this.authService.sendEmail()
+    }
     
 }

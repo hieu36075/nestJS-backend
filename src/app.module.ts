@@ -1,42 +1,27 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { PrismaModule } from './prisma/prisma.module';
+import { AuthModule } from './app/auth/auth.module';
+import { UserModule } from './app/user/user.module';
+import { PrismaModule } from './database/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { PostModule } from './post/post.module';
-import * as redisStore from 'cache-manager-redis-store';
-import { CacheModule, CacheInterceptor  } from '@nestjs/cache-manager';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { RedisConfigService } from './config/redis/redis.config';
+import { PostModule } from './app/post/post.module';
+import { CacheInterceptorModule } from './providers/redis/cache.interceptor';
+import { MailModule } from './providers/mail/mail.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    // CacheModule.register(   
-    // {     
-    //   isGlobal: true,
-    //   // @ts-ignore   
-    //   store: redisStore,
-    //   host: 'localhost', //default host
-    //   port: 6379 //default port
-    // }),
-    CacheModule.registerAsync({
-      isGlobal:true,
-      useClass: RedisConfigService,
-    }),
+    CacheInterceptorModule,
+    MailModule,
     AuthModule,
     UserModule,
     PrismaModule,
     PostModule,
   ],
   controllers: [AppController],
-  providers: [{
-    provide:APP_INTERCEPTOR,
-    useClass: CacheInterceptor
-  },AppService],
+  providers: [AppService],
 })
 export class AppModule { }

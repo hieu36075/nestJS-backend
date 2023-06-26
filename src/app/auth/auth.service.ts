@@ -1,10 +1,11 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma/prisma.service";
+import { PrismaService } from "src/database/prisma/prisma.service";
 import * as argon from 'argon2';
 import { AuthDTO } from "./dto";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { Role } from "@prisma/client";
+import { MailService } from "src/providers/mail/mail.service";
 
 @Injectable({})
 export class AuthService{
@@ -12,6 +13,7 @@ export class AuthService{
         private prismaService : PrismaService,
         private jwtService : JwtService,
         private configService: ConfigService,
+        private mailService : MailService
     ){
         
     }
@@ -100,6 +102,9 @@ export class AuthService{
         
     }
 
+    async sendEmail(){
+        return await this.mailService.sendEmail("longqb08122001@gmail.com", "hieutcgcd191045@fpt.edu.vn", "Hello Long ngu ", "Vào thư rác k ? ")
+    }
 
     // async forgetPassword(authDTO : AuthDTO)
     // {

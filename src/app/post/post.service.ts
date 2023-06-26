@@ -1,6 +1,6 @@
 import { Body, ForbiddenException, Injectable, Query } from "@nestjs/common";
 import { Post } from "@prisma/client";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "src/database/prisma/prisma.service";
 import { CreatePostDTO } from "./dto/create.note.dto";
 import { UpdatePostDTO } from "./dto";
 
@@ -14,16 +14,8 @@ export class PostService{
 
 
 
-    getPost() {
-        const posts = this.prismaService.post.findMany({
-            select:{
-                id:true,
-                title:true,
-                content:true,
-                published: true,
-            }
-        })        
-   
+    async getPost() : Promise<Post[]> {
+        const posts = await this.prismaService.post.findMany()          
         return posts
     }
 
@@ -31,7 +23,7 @@ export class PostService{
     //     return 
     // }
 
-    async getPostById(postId: string){
+    async getPostById(postId: string): Promise<Post>{
         const postById = await this.prismaService.post.findUnique({
             where:{
                 id: postId
@@ -49,7 +41,7 @@ export class PostService{
         return postByUser
     }
 
-    async createPost(id: string, @Body() createPostDTO:CreatePostDTO){
+    async createPost(id: string, @Body() createPostDTO:CreatePostDTO) : Promise<Post>{
         const post = await this.prismaService.post.create({
             data:{
                 ...createPostDTO,
@@ -59,7 +51,7 @@ export class PostService{
         return post
     }
 
-    async updatePostById(postId:string, @Body() updatePostDTO:UpdatePostDTO){
+    async updatePostById(postId:string, @Body() updatePostDTO:UpdatePostDTO) : Promise<Post | null>{
         const post = await this.prismaService.post.findUnique({
             where:{
                 id: postId
