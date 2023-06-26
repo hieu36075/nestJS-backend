@@ -14,7 +14,7 @@ export class PostService{
 
 
 
-    getPost(){
+    getPost() {
         const posts = this.prismaService.post.findMany({
             select:{
                 id:true,
@@ -23,6 +23,7 @@ export class PostService{
                 published: true,
             }
         })        
+   
         return posts
     }
 

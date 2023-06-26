@@ -4,6 +4,7 @@ import * as argon from 'argon2';
 import { AuthDTO } from "./dto";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
+import { Role } from "@prisma/client";
 
 @Injectable({})
 export class AuthService{
@@ -94,9 +95,9 @@ export class AuthService{
         }
     }
 
-    async viewRole(){
-        const roles = await this.prismaService.role.findMany()
-        return roles
+    async viewRole() : Promise<Role[]>{
+        return await this.prismaService.role.findMany()
+        
     }
 
 

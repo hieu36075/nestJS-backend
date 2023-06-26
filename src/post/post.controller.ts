@@ -1,5 +1,5 @@
 
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
 import { MyJwtGuard } from 'src/auth/guard';
@@ -9,12 +9,15 @@ import { Role } from 'src/auth/role.enum';
 import { GetUser } from 'src/auth/decorator/user.decorator';
 import { CreatePostDTO } from './dto/create.note.dto';
 import { UpdatePostDTO } from './dto';
+import { CacheInterceptor  } from '@nestjs/cache-manager';
+
 
 @Controller('posts')
 @ApiTags('Post')
 @ApiBearerAuth('JWT-auth')
 @Roles('User','Admin')
 @UseGuards(MyJwtGuard, RolesGuard) 
+@UseInterceptors(CacheInterceptor)
 export class PostController {
     constructor(
         private postService: PostService

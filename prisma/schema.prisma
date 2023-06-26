@@ -10,18 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// generator client{
-//   provider = "prisma-client-js"
-// }
-
-model Post {
-  id        String     @default(cuid()) @id
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
-  authorId  String?
-}
 
 model User {
   id            String       @default(cuid()) @id
@@ -30,16 +18,19 @@ model User {
   hashedPassword String
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
-  role          Role      @relation(fields: [roleId], references: [id])
+  role          Role      @relation(fields: [roleId], references: [id]) 
   roleId        String    
   posts         Post[]
+  oders         Order[]
+  voucher       UserVoucher[]
+  comment       Comment[]
   profile       Profile?
   @@map(name: "users")
 }
 
 model Role{
   id            String       @default(cuid()) @id
-  name          String
+  name          String        
   user          User[]
 }
 
@@ -53,6 +44,16 @@ model Profile {
   avatarUrl     String?
 }
 
+model Comment {
+  id            String       @default(cuid()) @id
+  name          String
+  description   String
+  user          User         @relation(fields: [userId], references: [id])
+  userId        String
+  hohel         Hotel        @relation(fields: [hotelId], references: [id])
+  hotelId       String
+  image         ImageComment[]
+}
 model Category{
   id            String       @default(cuid()) @id
   name          String
@@ -64,6 +65,7 @@ model Hotel {
   name          String
   address       String
   room          Room[]
+  comment       Comment[]
 }
 model Room{
   id            String       @default(cuid()) @id
@@ -79,12 +81,81 @@ model Room{
 
 }
 
+model Post {
+  id        String     @default(cuid()) @id
+  title     String
+  content   String?
+  published Boolean @default(false)
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  String?
+  image     ImageRoom[]
+}
+
 model ImageRoom{
   id            String       @default(cuid()) @id
   imageUrl      String?
   room          Room         @relation(fields: [idRoom], references: [id])
-  idRoom        String
+  idRoom        String       
+  post          Post?        @relation(fields: [postId], references: [id])
+  postId        String
+}
+
+model ImagePost{
+  id            String       @default(cuid()) @id
+  title         String
+  description   String
+  date          DateTime
+  
+}
+
+model ImageComment {
+  id            String       @default(cuid()) @id
+  title         String
+  description   String
+  date          DateTime
+  comment       Comment      @relation(fields: [commentId], references: [id])
+  commentId     String
 }
 
 
+model Order{
+  id            String       @default(cuid()) @id      
+  date          DateTime
+  price         Int
+  status        String
+  user          User         @relation(fields: [userId], references: [id])
+  userId        String          
+  orderdetails  OrderDetails[]
+  
+}
 
+model OrderDetails{
+  id            String       @default(cuid()) @id
+  oder          Order        @relation(fields: [orderId], references: [id]) 
+  orderId       String    
+  orderStatus   OrderDetailStatus   @default(IN_PROGRESS)
+
+}
+
+enum OrderDetailStatus {
+  IN_PROGRESS 
+  DONE
+}
+
+model UserVoucher{
+  id            String       @default(cuid()) @id   
+  user          User         @relation(fields: [userId], references: [id])
+  userId        String
+  status        VoucherStatus @default(isAvaiable)
+}
+
+enum VoucherStatus {
+  isAvaiable
+  avaiable 
+}
+
+model Voucher {
+  id            String       @default(cuid()) @id  
+  name          String
+  Description   String 
+}
