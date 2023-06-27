@@ -6,6 +6,7 @@ import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { Role } from "@prisma/client";
 import { MailService } from "src/providers/mail/mail.service";
+import { GoogleAuthDTO } from "./dto/googleAuth.dto";
 
 @Injectable({})
 export class AuthService{
@@ -23,8 +24,7 @@ export class AuthService{
             const user = await this.prismaService.user.create({
                 data:{
                     email: authDTO.email,
-                    hashedPassword: hashedPassword,
-                    name: '',             
+                    hashedPassword: hashedPassword,  
                     roleId: 'clgywq0h8000308l3a38y39t6'
                 },
                 select:{
@@ -51,16 +51,8 @@ export class AuthService{
             },
             include: {
                 role: true,
-                }
+            }
             
-            // select:{
-            //     id: true,
-            //     email: true,
-            //     role: true,
-            //     hashedPassword: true,
-            //     roleId: true,
-            //     profile: true,
-            // }
         })
         if(!user){
             throw new ForbiddenException('User not found')
@@ -97,6 +89,43 @@ export class AuthService{
         }
     }
 
+    async validateUser(authDTO: GoogleAuthDTO) {
+        console.log('AuthService');
+        // console.log(authDTO);
+        const user = await this.prismaService.user.findUnique({
+            where:{
+                email: authDTO.email
+            }
+        })
+        console.log(user);
+        if (user) return user;
+        console.log('User not found. Creating...');
+        const newUser = this.prismaService.user.create({
+            data:{
+                email: authDTO.email,
+                roleId: "clgywq0h8000308l3a38y39t6",
+                googleAccount:{
+                    create:{
+                        token: "a",
+                        refreshToken: "b"
+                    }
+                }
+            }
+        })
+        return newUser
+      }
+    
+    async findUser(id: string) {
+        const user = await this.prismaService.user.findUnique({
+            where:{
+                id: id
+            }
+        })
+        delete user.hashedPassword;
+        return user;
+    }  
+
+
     async viewRole() : Promise<Role[]>{
         return await this.prismaService.role.findMany()
         
@@ -105,7 +134,7 @@ export class AuthService{
     async sendEmail(){
         return await this.mailService.sendEmail("longqb08122001@gmail.com", "hieutcgcd191045@fpt.edu.vn", "Hello Long ngu ", "Vào thư rác k ? ")
     }
-
+    
     // async forgetPassword(authDTO : AuthDTO)
     // {
     //     const user = await this.prismaService.user.findUnique({

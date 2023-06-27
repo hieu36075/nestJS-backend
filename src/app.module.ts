@@ -8,12 +8,14 @@ import { ConfigModule } from '@nestjs/config';
 import { PostModule } from './app/post/post.module';
 import { CacheInterceptorModule } from './providers/redis/cache.interceptor';
 import { MailModule } from './providers/mail/mail.module';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    PassportModule.register({session:true}),
     CacheInterceptorModule,
     MailModule,
     AuthModule,

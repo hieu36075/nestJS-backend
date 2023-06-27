@@ -5,6 +5,7 @@ import { ApiBadRequestResponse, ApiCreatedResponse, ApiTags } from "@nestjs/swag
 import { MyJwtGuard } from "src/common/guard";
 import { Role } from "@prisma/client";
 import { MailService } from "src/providers/mail/mail.service";
+import { GoogleAuthGuard } from "src/common/guard/mygoogle.guard";
 @Controller('auth')
 @ApiTags('Auth')
 
@@ -32,7 +33,22 @@ export class AuthController {
     login(@Body() authDTO:AuthDTO){
         return this.authService.login(authDTO);
     }
+
     
+    @Get('google/login')
+    @UseGuards(GoogleAuthGuard)
+    googleLogin(){
+        return  {msg: "authen"}
+    }
+
+    
+    @Get('google/redirect')
+    @UseGuards(GoogleAuthGuard)
+    googleRedirect(){
+        return {msg: "ok"};
+    }
+
+
     @Get('mail')
     async sendMail(){
         return this.authService.sendEmail()
