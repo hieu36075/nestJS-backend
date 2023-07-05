@@ -15,29 +15,26 @@ export class PostService{
 
 
     async getPost() : Promise<Post[]> {
-        const posts = await this.prismaService.post.findMany()          
-        return posts
+        return await this.prismaService.post.findMany()          
+        
     }
 
-    // async getPostById(@Query('id') id?: string): Promise<Post>{
-    //     return 
-    // }
-
     async getPostById(postId: string): Promise<Post>{
-        const postById = await this.prismaService.post.findUnique({
+        return  await this.prismaService.post.findUnique({
             where:{
                 id: postId
             }
         })
-        return postById
+        
     }
 
-    getPostByUser(userId: string){
-        const postByUser = this.prismaService.post.findMany({
+    async getPostByUser(userId: string) : Promise<Post[]>{
+        const postByUser = await this.prismaService.post.findMany({
             where:{
                 authorId: userId
             }
         })
+        console.log(postByUser)
         return postByUser
     }
 
@@ -74,7 +71,7 @@ export class PostService{
         return newPost
     }
 
-    async deletePostById(postId:string){
+    async deletePostById(postId:string): Promise<void>{
         const post = await this.prismaService.post.findUnique({
             where:{
                 id:postId
@@ -85,7 +82,7 @@ export class PostService{
             throw new ForbiddenException('Cannot find Post in Database')
         }
         
-        return await this.prismaService.post.delete({
+        await this.prismaService.post.delete({
             where:{
                 id:postId
             }

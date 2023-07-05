@@ -25,7 +25,10 @@ model User {
   voucher       UserVoucher[]
   comment       Comment[]
   profile       Profile?
-  googleAccount   GoogleAcount?
+  googleAccount GoogleAcount?
+  phoneNumber   String?      // Số điện thoại của người dùng
+  address       String?      // Địa chỉ của người dùng
+  dateOfBirth   DateTime?    // Ngày sinh của người dùng
   @@map(name: "users")
 }
 
@@ -66,16 +69,48 @@ model Comment {
 model Category{
   id            String       @default(cuid()) @id
   name          String
+  imageURL      String?
+  hotels        Hotel[]
   room          Room[]
+  categoryRooms CategoryRoom[]
 }
 
+model CategoryRoom {
+  id         String    @default(cuid()) @id
+  name       String
+  category   Category  @relation(fields: [categoryId], references: [id])
+  categoryId String
+  rooms      Room[]    // Quan hệ 1-nhiều: Mỗi loại phòng có nhiều phòng
+}
+
+model Amenity{
+  id            String       @default(cuid()) @id
+  name          String       @unique
+  hotels        Hotel[]
+}
 model Hotel {
   id            String       @default(cuid()) @id
   name          String
   address       String
+  country       Country   @relation(fields: [countryId], references: [id])
+  countryId     String
+  phoneNumber   String
+  starRating    Int? 
+  category      Category  @relation(fields: [categoryId], references: [id])
+  categoryId    String
   room          Room[]
   comment       Comment[]
+  amenities     Amenity[]        
 }
+
+
+model Country{
+  id            String       @default(cuid()) @id
+  name          String
+  image         String?
+  hotels        Hotel[]      
+}
+
 model Room{
   id            String       @default(cuid()) @id
   name          String  
@@ -87,8 +122,12 @@ model Room{
   hotel         Hotel        @relation(fields: [hotelId], references: [id])
   hotelId       String
   imageRoom     ImageRoom[]
+  categoryRoom  CategoryRoom @relation(fields: [categoryRoomId], references: [id])
+  categoryRoomId String
 
 }
+
+
 
 model Post {
   id        String     @default(cuid()) @id
@@ -114,13 +153,14 @@ model ImagePost{
   title         String
   description   String
   date          DateTime
-  
+  imageUrl      String?
 }
 
 model ImageComment {
   id            String       @default(cuid()) @id
   title         String
   description   String
+  imageUrl      String?
   date          DateTime
   comment       Comment      @relation(fields: [commentId], references: [id])
   commentId     String

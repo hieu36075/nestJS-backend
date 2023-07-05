@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as session from 'express-session';
 import * as passport from 'passport';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +19,10 @@ async function bootstrap() {
   }))
   app.use(passport.initialize());
   app.use(passport.session());
+  // app.use('/auth/google', createProxyMiddleware({
+  //   target: 'http://localhost:3500',
+  //   changeOrigin: true,
+  // }));
   const config = new DocumentBuilder()
     .setTitle('Traveloka Fake')
     .setDescription('The Traveloka API description')
@@ -38,7 +43,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   app.enableCors({
     allowedHeaders: '*',
-    origin: '*',
+    origin: 'http://localhost:3000',
     credentials: true,
   });
   await app.listen(3500);

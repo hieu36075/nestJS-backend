@@ -13,7 +13,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy){
         private authSerivce: AuthService
     ){
         super({
-            authozrizationURL: 'http://localhost:3500',
             clientID: configserver.get("GOOGLE_CLIENT_ID"),
             clientSecret: configserver.get("GOOGLE_CLIENT_SECRET"),
             callbackURL: 'http://localhost:3500/auth/google/redirect',
@@ -24,10 +23,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy){
     async validate(accessToken: string, refreshToken: string, profile: Profile ): Promise<any>{
         const user = await this.authSerivce.validateUser({
             email: profile.emails[0].value,
-            displayName: profile.displayName
+            displayName: profile.displayName,
+            token : accessToken,
+            refreshToken: refreshToken
         })
-        console.log('Validate');
-        console.log(user);
+        // console.log('Validate');
+        // console.log(accessToken)
+        // console.log(user);
         return user || null;
     }
 }

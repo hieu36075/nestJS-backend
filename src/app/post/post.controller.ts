@@ -9,6 +9,7 @@ import { GetUser } from 'src/common/decorator/user.decorator';
 import { CreatePostDTO } from './dto/create.note.dto';
 import { UpdatePostDTO } from './dto';
 import { CacheInterceptor  } from '@nestjs/cache-manager';
+import { Post as PostEntity } from '@prisma/client';
 
 
 @Controller('posts')
@@ -24,17 +25,17 @@ export class PostController {
     }
 
     @Get()
-    getPost(){
-        return this.postService.getPost()
+    async getPost(): Promise<PostEntity[]>{
+        return await this.postService.getPost()
     }
 
     @Get('getByUserId')
-    getPostByUser(@GetUser('id') userId: string){
-        return this.postService.getPostByUser(userId);
+    async getPostByUser(@GetUser('id') userId: string) : Promise<PostEntity[]>{
+        return await this.postService.getPostByUser(userId);
     }
 
     @Get(':id')
-    getPostById(@Param('id') postId: string){
+    getPostById(@Query('id') postId: string){
         return this.postService.getPostById(postId);
     }
 
@@ -51,7 +52,7 @@ export class PostController {
 
     @HttpCode(HttpStatus.NO_CONTENT)
     @Delete()
-    deletePost(@Query('id') postId: string){
+    async deletePost(@Query('id') postId: string): Promise<void>{
         return this.postService.deletePostById(postId);
     }
 }

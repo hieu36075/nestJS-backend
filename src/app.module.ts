@@ -9,6 +9,8 @@ import { PostModule } from './app/post/post.module';
 import { CacheInterceptorModule } from './providers/redis/cache.interceptor';
 import { MailModule } from './providers/mail/mail.module';
 import { PassportModule } from '@nestjs/passport';
+import { CategoriesModule } from './app/categories/categories.module';
+import { HotelModule } from './app/hotel/hotel.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { PassportModule } from '@nestjs/passport';
     UserModule,
     PrismaModule,
     PostModule,
+    CategoriesModule,
+    HotelModule
   ],
   controllers: [AppController],
   providers: [AppService],

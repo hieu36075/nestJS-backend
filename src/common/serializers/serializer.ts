@@ -6,16 +6,18 @@ import { AuthService } from "src/app/auth/auth.service";
 export class SessionSerializer extends PassportSerializer{
     constructor(
         @Inject(AuthService)
-        private readonly authservice: AuthService
+        private  authservice: AuthService
     ){
         super();
     }
 
     serializeUser(user: User, done: Function) {
+        console.log("serializeUser")
         done(null, user)
     }
 
     deserializeUser(payload: any, done: Function) {
+        // console.log("deserializeUser", payload)
         const user = this.authservice.findUser(payload.id);
         return user ? done(null, user) : done(null, null);
     }

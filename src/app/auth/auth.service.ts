@@ -7,6 +7,7 @@ import { ConfigService } from "@nestjs/config";
 import { Role } from "@prisma/client";
 import { MailService } from "src/providers/mail/mail.service";
 import { GoogleAuthDTO } from "./dto/googleAuth.dto";
+import { access } from "fs";
 
 @Injectable({})
 export class AuthService{
@@ -89,25 +90,47 @@ export class AuthService{
         }
     }
 
-    async validateUser(authDTO: GoogleAuthDTO) {
+    async validateUser(authDTO: GoogleAuthDTO) : Promise<any> {
         console.log('AuthService');
-        // console.log(authDTO);
         const user = await this.prismaService.user.findUnique({
             where:{
                 email: authDTO.email
-            }
+            },
+            include:{
+                role:true,
+                googleAccount:true,
+            }    
         })
-        console.log(user);
-        if (user) return user;
+
+        if(user){  
+            const updateUser = await this.prismaService.user.update({
+                where:{
+                    id: user.id,
+                },
+                data:{
+                    googleAccount:{
+                        update:{
+                            token: authDTO.token,
+                            refreshToken: authDTO.refreshToken,
+                        }
+                    }
+                },
+                include:{
+                    role:true
+                }
+            })      
+            return updateUser
+        }
+
         console.log('User not found. Creating...');
-        const newUser = this.prismaService.user.create({
+        const newUser = await this.prismaService.user.create({
             data:{
                 email: authDTO.email,
                 roleId: "clgywq0h8000308l3a38y39t6",
                 googleAccount:{
                     create:{
-                        token: "a",
-                        refreshToken: "b"
+                        token: authDTO.token,
+                        refreshToken: authDTO.refreshToken
                     }
                 }
             }
@@ -121,9 +144,11 @@ export class AuthService{
                 id: id
             }
         })
+
         delete user.hashedPassword;
         return user;
     }  
+
 
 
     async viewRole() : Promise<Role[]>{
