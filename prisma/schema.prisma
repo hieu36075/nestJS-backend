@@ -124,7 +124,6 @@ model Room{
   imageRoom     ImageRoom[]
   categoryRoom  CategoryRoom @relation(fields: [categoryRoomId], references: [id])
   categoryRoomId String
-
 }
 
 

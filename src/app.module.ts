@@ -11,6 +11,10 @@ import { MailModule } from './providers/mail/mail.module';
 import { PassportModule } from '@nestjs/passport';
 import { CategoriesModule } from './app/categories/categories.module';
 import { HotelModule } from './app/hotel/hotel.module';
+import { CountryModule } from './app/country/country.module';
+import { ProfileModule } from './app/profile/profile.module';
+import { AwsS3Module } from './providers/aws s3/aws.s3.module';
+
 
 @Module({
   imports: [
@@ -25,7 +29,10 @@ import { HotelModule } from './app/hotel/hotel.module';
     PrismaModule,
     PostModule,
     CategoriesModule,
-    HotelModule
+    HotelModule,
+    CountryModule,
+    ProfileModule,
+    AwsS3Module
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -8,6 +8,7 @@ import { Role } from "@prisma/client";
 import { MailService } from "src/providers/mail/mail.service";
 import { GoogleAuthDTO } from "./dto/googleAuth.dto";
 import { access } from "fs";
+import { S3Service } from "src/providers/aws s3/aws.s3.service";
 
 @Injectable({})
 export class AuthService{
@@ -15,7 +16,8 @@ export class AuthService{
         private prismaService : PrismaService,
         private jwtService : JwtService,
         private configService: ConfigService,
-        private mailService : MailService
+        private mailService : MailService,
+        private s3Service : S3Service
     ){
         
     }
@@ -160,6 +162,15 @@ export class AuthService{
         return await this.mailService.sendEmail("longqb08122001@gmail.com", "hieutcgcd191045@fpt.edu.vn", "Hello Long ngu ", "Vào thư rác k ? ")
     }
     
+    async upload(file:any){
+        return await this.s3Service.uploadFile(file,"hotel/");
+    }
+
+    async multiUpload(files: Express.Multer.File[]){
+        return this.s3Service.uploadMultipleFiles(files, "test/")
+    }
+
+
     // async forgetPassword(authDTO : AuthDTO)
     // {
     //     const user = await this.prismaService.user.findUnique({

@@ -9,7 +9,7 @@ import { UpdateHotelDTO } from "./dto/update.hotel.dto";
 import { Roles } from "src/common/decorator";
 import { RolesGuard } from "src/common/guard/roles.guard";
 import { CacheInterceptor } from "@nestjs/cache-manager";
-
+import { PaginationResult } from "src/common/interface/pagination.interface";
 
 @Controller('hotel')
 @ApiTags('Hotel')
@@ -24,8 +24,8 @@ export class HotelController{
   
 
     @Get()
-    async getAll() : Promise<Hotel[]>{
-        return await this.hotelService.getHotel()
+    async getAll(@Query('page') page: number,@Query('perPage') perPage: number) : Promise<PaginationResult<Hotel>>{
+        return await this.hotelService.getHotel(page, perPage)
     }
 
     @Get(':id')

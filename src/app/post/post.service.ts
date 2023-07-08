@@ -34,7 +34,7 @@ export class PostService{
                 authorId: userId
             }
         })
-        console.log(postByUser)
+    
         return postByUser
     }
 

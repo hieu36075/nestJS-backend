@@ -10,7 +10,7 @@ import { RolesGuard } from "src/common/guard/roles.guard";
 import { Roles } from "src/common/decorator";
 import { CacheInterceptor  } from '@nestjs/cache-manager';
 
-@Controller('Categories')
+@Controller('categories')
 @ApiTags('Categories')
 @ApiBearerAuth('JWT-auth')
 @Roles('User')
