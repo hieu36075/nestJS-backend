@@ -49,9 +49,9 @@ export class AuthController {
     // @Redirect('http://localhost:3000', 301)
     async googleRedirect(@Req() req, @Res() res: Response){
         const user = req.user
-        const token = this.authService.createJwtToken(user.id, user.email, user.role.name)
-        console.log(req.host)
-        return token;
+        const token = await this.authService.createJwtToken(user.id, user.email, user.role.name)
+        console.log(token)
+        return token
         
     }
 
@@ -65,14 +65,12 @@ export class AuthController {
     @Post('file-upload')
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@UploadedFile() file: Express.Multer.File){
-        console.log(file)
         return this.authService.upload(file);
     }
 
     @Post('/multiple-file-upload')
     @UseInterceptors(FilesInterceptor('files', 5))
-    async uploadMultipleFiles(@UploadedFiles() files: Express.Multer.File[]) {
-
+    async uploadMultipleFiles(@UploadedFiles() files: Express.Multer.File[]): Promise<string[]> {
         return  await this.authService.multiUpload(files);
 }
 }

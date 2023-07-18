@@ -103,8 +103,8 @@ export class AuthService{
                 googleAccount:true,
             }    
         })
-
         if(user){  
+            console.log("update....")
             const updateUser = await this.prismaService.user.update({
                 where:{
                     id: user.id,
@@ -121,10 +121,10 @@ export class AuthService{
                     role:true
                 }
             })      
+      
             return updateUser
         }
 
-        console.log('User not found. Creating...');
         const newUser = await this.prismaService.user.create({
             data:{
                 email: authDTO.email,
@@ -135,6 +135,9 @@ export class AuthService{
                         refreshToken: authDTO.refreshToken
                     }
                 }
+            },
+            include:{
+                role:true
             }
         })
         return newUser
@@ -163,10 +166,10 @@ export class AuthService{
     }
     
     async upload(file:any){
-        return await this.s3Service.uploadFile(file,"hotel/");
+        return await this.s3Service.uploadFile(file,"avatar/a/");
     }
 
-    async multiUpload(files: Express.Multer.File[]){
+    async multiUpload(files: Express.Multer.File[]): Promise<string[]>{
         return this.s3Service.uploadMultipleFiles(files, "test/")
     }
 

@@ -57,6 +57,15 @@ CREATE TABLE "Country" (
 );
 
 -- CreateTable
+CREATE TABLE "HotelImage" (
+    "id" TEXT NOT NULL,
+    "hotelId" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+
+    CONSTRAINT "HotelImage_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_AmenityToHotel" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
@@ -82,6 +91,9 @@ ALTER TABLE "Hotel" ADD CONSTRAINT "Hotel_categoryId_fkey" FOREIGN KEY ("categor
 
 -- AddForeignKey
 ALTER TABLE "Room" ADD CONSTRAINT "Room_categoryRoomId_fkey" FOREIGN KEY ("categoryRoomId") REFERENCES "CategoryRoom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "HotelImage" ADD CONSTRAINT "HotelImage_hotelId_fkey" FOREIGN KEY ("hotelId") REFERENCES "Hotel"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_AmenityToHotel" ADD CONSTRAINT "_AmenityToHotel_A_fkey" FOREIGN KEY ("A") REFERENCES "Amenity"("id") ON DELETE CASCADE ON UPDATE CASCADE;

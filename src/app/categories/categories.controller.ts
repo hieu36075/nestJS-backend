@@ -13,7 +13,7 @@ import { CacheInterceptor  } from '@nestjs/cache-manager';
 @Controller('categories')
 @ApiTags('Categories')
 @ApiBearerAuth('JWT-auth')
-@Roles('User')
+@Roles('Admin')
 @UseGuards(MyJwtGuard, RolesGuard)
 @UseInterceptors(CacheInterceptor)
 export class CategoriesController{

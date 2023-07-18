@@ -7,6 +7,7 @@ import { UserService } from "./user.service";
 import { RolesGuard } from "src/common/guard/roles.guard";
 import { CacheInterceptor } from "@nestjs/cache-manager";
 import { Roles } from "src/common/decorator";
+import { GetUser } from "src/common/decorator/user.decorator";
 
 
 @Controller('user')
@@ -25,9 +26,9 @@ export class UserController{
         return await this.userService.getUser();
     }
 
-    @Roles('User')
-    @Get(':id')
-    async getUserById(@Query('id') userId: string): Promise<User>{
+
+    @Get('getById')
+    async getUserById(@GetUser('id') userId: string): Promise<User>{
         return this.userService.getUserById(userId);
     }
 }

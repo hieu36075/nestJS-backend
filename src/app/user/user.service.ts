@@ -14,7 +14,12 @@ export class UserService{
     async getUser(): Promise<User[]> {
         const users = await this.prismaService.user.findMany({
             include:{
-                profile:true
+                profile:true,
+                role:{
+                    select:{
+                        name:true
+                    }
+                }
             }
         });
         // const sanitizedUsers = users.map(user => Object.assign({}, user, { hashedPassword: undefined }));

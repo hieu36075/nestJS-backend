@@ -33,7 +33,6 @@ private s3Client: S3Client;
 
     const command = new PutObjectCommand(params);
     const response = await this.s3Client.send(command);
-
     if (response.$metadata.httpStatusCode === 200) {
         const fileUrl = `https://${this.cloundFront}/${file.originalname}`;
         return fileUrl;
@@ -44,28 +43,27 @@ private s3Client: S3Client;
 
 
 
-    async  uploadMultipleFiles(files: Express.Multer.File[], path: string): Promise<string[]> {
-        const fileUrls: string[] = [];
+  async  uploadMultipleFiles(files: Express.Multer.File[], path: string): Promise<string[]> {
+    const fileUrls: string[] = [];
+
+    for (const file of files) {
+      const fileData = file.buffer;
       
-        for (const file of files) {
-          const fileData = file.buffer;
+      const params = {
+        Bucket: this.bucketName,
+        Key: path + file.originalname,
+        Body: fileData,
+        ContentType: file.mimetype,
+      };
       
-          const params = {
-            Bucket: this.bucketName,
-            Key: path + file.originalname,
-            Body: fileData,
-            ContentType: file.mimetype,
-          };
-      
-          const command = new PutObjectCommand(params);
-          const uploadPromise = this.s3Client.send(command).then(() => {
-            const fileUrl = `https://${this.cloundFront}/${file.originalname}`;
-            return fileUrl;
-          });
-      
-          fileUrls.push(await uploadPromise);
-        }
-      
-        return fileUrls;
-      }
+      const command = new PutObjectCommand(params);
+      const uploadPromise = this.s3Client.send(command).then(() => {
+        const fileUrl = `https://${this.cloundFront}/${file.originalname}`;
+        return fileUrl;
+      });     
+      fileUrls.push(await uploadPromise);
+    }
+    return fileUrls;
+  }
+  
 }

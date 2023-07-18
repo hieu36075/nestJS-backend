@@ -13,7 +13,11 @@ export class CategoriesService{
 
 
     async getAll():Promise<Category[]>{
-        return await this.prismaService.category.findMany();
+        return await this.prismaService.category.findMany({
+            include:{
+                hotels:true,
+            }
+        });
     }
 
     async createCategory(@Body() createCategoryDTO : CreateCategoryDTO):Promise<Category>{

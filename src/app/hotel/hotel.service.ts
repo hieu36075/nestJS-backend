@@ -12,9 +12,7 @@ export class HotelService{
         ){
     }
 
-    async paginationPage():Promise<any>{
 
-    }
     async getHotel(page: number, perPage: number):Promise<PaginationResult<Hotel>>{
         const totalItems = await this.prismaService.hotel.count();
         const totalPages = Math.ceil(totalItems / perPage);
@@ -23,10 +21,17 @@ export class HotelService{
         const data = await this.prismaService.hotel.findMany({
             skip,
             take,
-            include:{
-                room:true
-            }
-        })
+            include: {
+              room: true,
+              comment: true,
+              amenities: true,
+              images:{
+                select:{
+                    url:true
+                }
+              }
+            },
+          });
 
         const meta = {page,perPage,totalItems,totalPages}
 
@@ -50,7 +55,7 @@ export class HotelService{
     async createHotel(@Body() createHotelDTO : CreateHotelDTO):Promise<Hotel>{
         return await this.prismaService.hotel.create({
             data:{
-                ...createHotelDTO
+                ...createHotelDTO,
             }
         })
     }
