@@ -9,17 +9,21 @@ import { MailService } from "src/providers/mail/mail.service";
 import { GoogleAuthDTO } from "./dto/googleAuth.dto";
 import { access } from "fs";
 import { S3Service } from "src/providers/aws s3/aws.s3.service";
+import { createOAuth2Client } from "src/config/google/oauth2.config";
+import { OAuth2Client, LoginTicket } from 'google-auth-library';
 
 @Injectable({})
 export class AuthService{
+    private readonly client: OAuth2Client
     constructor(
         private prismaService : PrismaService,
         private jwtService : JwtService,
         private configService: ConfigService,
         private mailService : MailService,
-        private s3Service : S3Service
+        private s3Service : S3Service,
+
     ){
-        
+        this.client = createOAuth2Client();
     }
     async register(authDTO : AuthDTO){
         const hashedPassword = await argon.hash(authDTO.password)
@@ -92,47 +96,37 @@ export class AuthService{
         }
     }
 
-    async validateUser(authDTO: GoogleAuthDTO) : Promise<any> {
-        console.log('AuthService');
+    async verifyGoogleIdToken(token: string): Promise<any> {
+        const ticket = await this.client.verifyIdToken({
+          idToken: token,
+          audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const { email, name, picture } = ticket.getPayload();
+        const user = await this.loginGoogle(email, name, picture)
+        
+        return await this.createJwtToken(user.id , user.email , user.role.name)
+      }
+
+
+    async loginGoogle(email: string, name:string, picture:string) : Promise<any> {
         const user = await this.prismaService.user.findUnique({
             where:{
-                email: authDTO.email
+                email: email
             },
             include:{
                 role:true,
-                googleAccount:true,
             }    
         })
-        if(user){  
-            console.log("update....")
-            const updateUser = await this.prismaService.user.update({
-                where:{
-                    id: user.id,
-                },
-                data:{
-                    googleAccount:{
-                        update:{
-                            token: authDTO.token,
-                            refreshToken: authDTO.refreshToken,
-                        }
-                    }
-                },
-                include:{
-                    role:true
-                }
-            })      
-      
-            return updateUser
-        }
-
+        if(!user){
         const newUser = await this.prismaService.user.create({
             data:{
-                email: authDTO.email,
+                email: email,
+                name: name,
                 roleId: "clgywq0h8000308l3a38y39t6",
-                googleAccount:{
+                profile:{
                     create:{
-                        token: authDTO.token,
-                        refreshToken: authDTO.refreshToken
+                        fullName:"a",
+                        avatarUrl: picture
                     }
                 }
             },
@@ -140,22 +134,11 @@ export class AuthService{
                 role:true
             }
         })
-        return newUser
-      }
+            return newUser
+        }
+        return user
+    }
     
-    async findUser(id: string) {
-        const user = await this.prismaService.user.findUnique({
-            where:{
-                id: id
-            }
-        })
-
-        delete user.hashedPassword;
-        return user;
-    }  
-
-
-
     async viewRole() : Promise<Role[]>{
         return await this.prismaService.role.findMany()
         

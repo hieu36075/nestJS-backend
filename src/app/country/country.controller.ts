@@ -6,6 +6,7 @@ import { Roles } from "src/common/decorator";
 import { MyJwtGuard } from "src/common/guard";
 import { RolesGuard } from "src/common/guard/roles.guard";
 import { CacheInterceptor } from "@nestjs/cache-manager";
+import { Public } from "src/common/decorator/public.decorator";
 
 @Controller('country')
 @ApiTags('Country')
@@ -21,5 +22,11 @@ export class CountryControlller{
     @Get()
     async getAll(): Promise<Country[]>{
         return await this.countryService.getCountry();
+    }
+
+    @Public()
+    @Get('topCountry')
+    async topCountriesWithMostHotels(): Promise<Country[]>{
+        return await this.countryService.topCountriesWithMostHotels()
     }
 }

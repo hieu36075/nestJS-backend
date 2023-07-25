@@ -5,8 +5,8 @@ import { ApiBadRequestResponse, ApiCreatedResponse, ApiTags } from "@nestjs/swag
 import { MyJwtGuard } from "src/common/guard";
 import { Role } from "@prisma/client";
 import { MailService } from "src/providers/mail/mail.service";
-import { GoogleAuthGuard } from "src/common/guard/mygoogle.guard";
-import { FileInterceptor, FileFieldsInterceptor, AnyFilesInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor,FilesInterceptor } from '@nestjs/platform-express';
+
 @Controller('auth')
 @ApiTags('Auth')
 
@@ -36,23 +36,10 @@ export class AuthController {
         return this.authService.login(authDTO);
     }
 
-    
-    @Get('google/login')
-    @UseGuards(GoogleAuthGuard)
-    async googleLogin(){
-
-    }
-
-    
-    @Get('google/redirect')
-    @UseGuards(GoogleAuthGuard)
-    // @Redirect('http://localhost:3000', 301)
-    async googleRedirect(@Req() req, @Res() res: Response){
-        const user = req.user
-        const token = await this.authService.createJwtToken(user.id, user.email, user.role.name)
-        console.log(token)
-        return token
-        
+    @Post('login/google')
+    async loginByGoogle(@Body('token') token:string): Promise<any>{
+        const ticket = await this.authService.verifyGoogleIdToken(token)
+        return ticket
     }
 
 

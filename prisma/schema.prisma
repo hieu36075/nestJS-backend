@@ -26,9 +26,9 @@ model User {
   comment       Comment[]
   profile       Profile?
   googleAccount GoogleAcount?
-  phoneNumber   String?      // Số điện thoại của người dùng
-  address       String?      // Địa chỉ của người dùng
-  dateOfBirth   DateTime?    // Ngày sinh của người dùng
+  phoneNumber   String?     
+  address       String?      
+  dateOfBirth   DateTime?    
   @@map(name: "users")
 }
 

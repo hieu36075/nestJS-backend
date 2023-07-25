@@ -11,4 +11,18 @@ export class CountryService{
     async getCountry():Promise<Country[]>{
         return await this.prismaService.country.findMany()
     }
+
+    async topCountriesWithMostHotels():Promise<Country[]>{
+        return await this.prismaService.country.findMany({
+            include: {
+                hotels: true,
+              },
+              orderBy: {
+                hotels: {
+                    _count: 'desc',
+                },
+              },
+              take: 3,
+        })
+    }
 }
