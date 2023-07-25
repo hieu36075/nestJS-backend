@@ -24,7 +24,7 @@ export class CategoriesController{
         return this.categoriesService.getAll();
     }
     
-    @Get(':id/hotels')
+    @Get('hotels/:id')
     async getByCountry(@Param('id') countryId : string): Promise<Hotel[]>{
         return await this.categoriesService.getHotelByCategory(countryId);
     }

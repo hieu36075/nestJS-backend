@@ -88,4 +88,12 @@ export class HotelService{
             }
         })
     }
+
+    async getHotelByCountry(countryId: string): Promise<any>{
+      return  await this.prismaService.hotel.findMany({
+            where:{
+                countryId: countryId
+            }
+        })
+    }
 }
