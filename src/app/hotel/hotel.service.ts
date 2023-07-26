@@ -93,6 +93,19 @@ export class HotelService{
       return  await this.prismaService.hotel.findMany({
             where:{
                 countryId: countryId
+            },
+            include:{
+                images:true,
+            }
+        })
+    }
+    
+    async getHotelByCategory(categoryId : string): Promise<any>{
+        return await this.prismaService.hotel.findMany({
+            where:{
+                categoryId: categoryId
+            }, include:{
+                images:true
             }
         })
     }

@@ -41,6 +41,13 @@ export class HotelController{
     async getHotelByCountry(@Param('id') countryId: string): Promise<any>{
         return await this.hotelService.getHotelByCountry(countryId)
     }
+
+    @Public()
+    @Get('/get-hotel-by-category/:id')
+    async getHotelByCategory(@Param('id') categoryId: string): Promise<any>{
+        return await this.hotelService.getHotelByCategory(categoryId)
+    }
+
     @Post()
     async createHotel(@Body() craeteHotelDTO:CreateHotelDTO): Promise<Hotel>{
         return await this.hotelService.createHotel(craeteHotelDTO)
