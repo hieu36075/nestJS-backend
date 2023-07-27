@@ -4,6 +4,7 @@ import { PrismaService } from "src/database/prisma/prisma.service";
 import { CreateHotelDTO } from "./dto/create.hotel.dto";
 import { UpdateHotelDTO } from "./dto/update.hotel.dto";
 import { PaginationResult } from "src/common/interface/pagination.interface";
+import { GetHotelFilterDTO } from "./dto/getfilter.hotel.dto";
 
 @Injectable()
 export class HotelService{
@@ -109,4 +110,25 @@ export class HotelService{
             }
         })
     }
+
+    async getHotelByFilter(getHotelByFilter: GetHotelFilterDTO):Promise<any>{
+        const where = this.buildFilterConditions(getHotelByFilter);
+
+        return await this.prismaService.hotel.findMany({
+            where
+        });
+    }
+
+    private buildFilterConditions(filter: GetHotelFilterDTO) {
+        const { name, address, countryId, starRating, categoryId } = filter;
+        const where: any = {};
+    
+        if (name) where['name'] = { contains: name };
+        if (address) where['address'] = address;
+        if (countryId) where['countryId'] = countryId;
+        if (starRating !== undefined) where['starRating'] = starRating;
+        if (categoryId) where['categoryId'] = categoryId;
+    
+        return where;
+      }
 }

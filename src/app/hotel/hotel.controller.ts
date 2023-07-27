@@ -11,6 +11,7 @@ import { RolesGuard } from "src/common/guard/roles.guard";
 import { CacheInterceptor } from "@nestjs/cache-manager";
 import { PaginationResult } from "src/common/interface/pagination.interface";
 import { Public } from "src/common/decorator/public.decorator";
+import { GetHotelFilterDTO } from "./dto/getfilter.hotel.dto";
 
 @Controller('hotel')
 @ApiTags('Hotel')
@@ -30,9 +31,15 @@ export class HotelController{
         return await this.hotelService.getHotel(page, perPage)
     }
 
+    @Public()
+    @Get('/search')
+    async Search (@Query('countryId') countryId?: string, @Query('name') name?:string,@Query('caregoryId') categoryId?:string ):Promise<any>{
+        return await this.hotelService.getHotelByFilter({countryId, name, categoryId})
+    }
 
     @Get(':id')
     async getById(@Param('id') hotelId : string): Promise<Hotel | null>{
+        console.log("a")
         return await this.hotelService.getHotelById(hotelId)
     }
 
@@ -47,6 +54,7 @@ export class HotelController{
     async getHotelByCategory(@Param('id') categoryId: string): Promise<any>{
         return await this.hotelService.getHotelByCategory(categoryId)
     }
+
 
     @Post()
     async createHotel(@Body() craeteHotelDTO:CreateHotelDTO): Promise<Hotel>{
@@ -66,4 +74,5 @@ export class HotelController{
         return this.hotelService.deleteHotel(hotelId);
     }
     
+
 }

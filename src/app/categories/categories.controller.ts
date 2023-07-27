@@ -9,6 +9,7 @@ import { UpdateCategoryDTO } from "./dto/update.category.dto";
 import { RolesGuard } from "src/common/guard/roles.guard";
 import { Roles } from "src/common/decorator";
 import { CacheInterceptor  } from '@nestjs/cache-manager';
+import { Public } from "src/common/decorator/public.decorator";
 
 @Controller('categories')
 @ApiTags('Categories')
@@ -19,6 +20,7 @@ import { CacheInterceptor  } from '@nestjs/cache-manager';
 export class CategoriesController{
     constructor( private readonly categoriesService:CategoriesService){}
 
+    @Public()
     @Get()
     getCategories(): Promise<Category[]>{
         return this.categoriesService.getAll();
