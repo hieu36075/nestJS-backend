@@ -24,12 +24,23 @@ model User {
   oders         Order[]
   voucher       UserVoucher[]
   comment       Comment[]
+  notifications Notification[]
   profile       Profile?
   googleAccount GoogleAcount?
   phoneNumber   String?     
   address       String?      
   dateOfBirth   DateTime?    
+  isActive      Boolean     @default(true) 
+
   @@map(name: "users")
+}
+
+model Notification {
+  id        String       @default(cuid()) @id
+  data      String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
 }
 
 model GoogleAcount {
@@ -64,14 +75,14 @@ model Comment {
   userId        String
   hohel         Hotel        @relation(fields: [hotelId], references: [id])
   hotelId       String
-  image         ImageComment[]
+  images         ImageComment[]
 }
 model Category{
   id            String       @default(cuid()) @id
   name          String
-  imageURL      String?
+  imageUrl      String?
   hotels        Hotel[]
-  room          Room[]
+  rooms          Room[]
   categoryRooms CategoryRoom[]
 }
 
@@ -80,7 +91,7 @@ model CategoryRoom {
   name       String
   category   Category  @relation(fields: [categoryId], references: [id])
   categoryId String
-  rooms      Room[]    // Quan hệ 1-nhiều: Mỗi loại phòng có nhiều phòng
+  rooms      Room[]  
 }
 
 model Amenity{
@@ -99,18 +110,29 @@ model Hotel {
   starRating    Int? 
   category      Category  @relation(fields: [categoryId], references: [id])
   categoryId    String
-  room          Room[]
+  checkInTime   DateTime?  
+  checkOutTime  DateTime?  
+  extraInfo     String?
+  isActive      Boolean     @default(true) 
+  rooms         Room[]
   images        ImageHotel[]
-  comment       Comment[]
-  amenities     Amenity[]        
+  comments      Comment[]
+  amenities     Amenity[]       
 }
-
 
 model Country{
   id            String       @default(cuid()) @id
   name          String
   image         String?
-  hotels        Hotel[]      
+  hotels        Hotel[] 
+  cities        City[]     
+}
+
+model City {
+  id        String       @default(cuid()) @id
+  name      String
+  country   Country      @relation(fields: [countryId], references: [id])
+  countryId String
 }
 
 model Room{
@@ -123,6 +145,7 @@ model Room{
   idCategory    String
   hotel         Hotel        @relation(fields: [hotelId], references: [id])
   hotelId       String
+  occupancy     Int 
   imageRoom     ImageRoom[]
   categoryRoom  CategoryRoom @relation(fields: [categoryRoomId], references: [id])
   categoryRoomId String
@@ -142,7 +165,7 @@ model Post {
   published Boolean @default(false)
   author    User?   @relation(fields: [authorId], references: [id])
   authorId  String?
-  image     ImageRoom[]
+  images     ImageRoom[]
 }
 
 model ImageRoom{

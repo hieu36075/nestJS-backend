@@ -34,5 +34,14 @@ export class CreateHotelDTO{
     @ApiProperty()
     categoryId: string
 
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    checkInTime: string; // Sử dụng kiểu string cho checkInTime
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    checkOutTime: string; // Sử dụng kiểu string cho checkOutTime
 }
 

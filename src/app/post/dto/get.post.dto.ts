@@ -1,8 +1,5 @@
-
-
-export class GetPostDTO{
-    title: string
-    content: string 
-    published: boolean 
-
+export class GetPostDTO {
+  title: string;
+  content: string;
+  published: boolean;
 }

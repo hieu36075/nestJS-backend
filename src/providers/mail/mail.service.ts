@@ -8,7 +8,12 @@ export class MailService {
     private readonly mailerService: MailerService,
   ) {}
 
-  async sendEmail(to: string,from: string, subject: string, body: string): Promise<void> {
+  async sendEmail(
+    to: string,
+    from: string,
+    subject: string,
+    body: string,
+  ): Promise<void> {
     await this.mailerService.sendMail({
       to,
       from,

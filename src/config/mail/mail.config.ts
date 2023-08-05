@@ -1,5 +1,4 @@
-import { MailerOptions } from "@nestjs-modules/mailer";
-import { createTransport } from "nodemailer";
+import { MailerOptions } from '@nestjs-modules/mailer';
 export const mailerConfig: MailerOptions = {
   transport: {
     host: 'smtp.elasticemail.com',
@@ -14,6 +13,3 @@ export const mailerConfig: MailerOptions = {
     from: 'hieutcgcd191045@fpt.edu.vn',
   },
 };
-
-
-

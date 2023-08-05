@@ -1,10 +1,10 @@
-import { Module } from "@nestjs/common";
-import { ProfileController } from "./profile.controller";
-import { ProfileService } from "./profile.service";
+import { Module } from '@nestjs/common';
+import { ProfileController } from './profile.controller';
+import { ProfileService } from './profile.service';
 
 @Module({
-    imports:[],
-    controllers: [ProfileController],
-    providers:[ProfileService],
+  imports: [],
+  controllers: [ProfileController],
+  providers: [ProfileService],
 })
-export class ProfileModule{}
+export class ProfileModule {}

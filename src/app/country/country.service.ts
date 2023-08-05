@@ -1,30 +1,26 @@
-import { Injectable } from "@nestjs/common";
-import { Country } from "@prisma/client";
-import { PrismaService } from "src/database/prisma/prisma.service";
+import { Injectable } from '@nestjs/common';
+import { Country } from '@prisma/client';
+import { PrismaService } from 'src/database/prisma/prisma.service';
 
 @Injectable()
-export class CountryService{
-    constructor(
-        private prismaService:PrismaService,
-    ){}
+export class CountryService {
+  constructor(private prismaService: PrismaService) {}
 
-    async getCountry():Promise<Country[]>{
-        return await this.prismaService.country.findMany()
-    }
+  async getCountry(): Promise<Country[]> {
+    return await this.prismaService.country.findMany();
+  }
 
-    async topCountriesWithMostHotels():Promise<Country[]>{
-        return await this.prismaService.country.findMany({
-            include: {
-                hotels: true,
-              },
-              orderBy: {
-                hotels: {
-                    _count: 'desc',
-                },
-              },
-              take: 3,
-        })
-    }
-
-  
+  async topCountriesWithMostHotels(): Promise<Country[]> {
+    return await this.prismaService.country.findMany({
+      include: {
+        hotels: true,
+      },
+      orderBy: {
+        hotels: {
+          _count: 'desc',
+        },
+      },
+      take: 3,
+    });
+  }
 }
