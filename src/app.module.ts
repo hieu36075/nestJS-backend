@@ -17,6 +17,9 @@ import { AwsS3Module } from './providers/aws s3/aws.s3.module';
 import { SocketModule } from './providers/socket/socket.module';
 import { RedisModule } from '@liaoliaots/nestjs-redis/dist/redis/redis.module';
 import { NotificationsModule } from './app/notifications/notifications.module';
+import { AmentityModule } from './app/amentity/amenity.module';
+import { RoomModule } from './app/room/room.module';
+import { CityModule } from './app/city/city.module';
 
 @Module({
   imports: [
@@ -46,6 +49,9 @@ import { NotificationsModule } from './app/notifications/notifications.module';
     ProfileModule,
     AwsS3Module,
     NotificationsModule,
+    AmentityModule,
+    RoomModule,
+    CityModule
   ],
   controllers: [AppController],
   providers: [AppService],

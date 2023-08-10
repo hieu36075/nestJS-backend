@@ -11,6 +11,7 @@ import {
   HttpCode,
   HttpStatus,
   UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -25,6 +26,7 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 import { PaginationResult } from 'src/common/interface/pagination.interface';
 import { Public } from 'src/common/decorator/public.decorator';
 import { GetHotelFilterDTO } from './dto/getfilter.hotel.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('hotel')
 @ApiTags('Hotel')
@@ -88,6 +90,16 @@ export class HotelController {
   ): Promise<Hotel | null> {
     return await this.hotelService.updateHotel(hotelId, updateHotelDTO);
   }
+
+  @Public()
+  @Post('/multiple-file-upload')
+  @UseInterceptors(FilesInterceptor('files', 5))
+  async uploadMultipleFiles(
+    @UploadedFiles() files: Express.Multer.File[],
+  ): Promise<string[]> {
+    return await this.hotelService.multiUpload(files);
+  }
+
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete()

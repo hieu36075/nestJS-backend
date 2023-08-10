@@ -11,9 +11,13 @@ import { UpdateHotelDTO } from './dto/update.hotel.dto';
 import { PaginationResult } from 'src/common/interface/pagination.interface';
 import { GetHotelFilterDTO } from './dto/getfilter.hotel.dto';
 import { RedisService } from '@liaoliaots/nestjs-redis';
+import { S3Service } from 'src/providers/aws s3/aws.s3.service';
 @Injectable()
 export class HotelService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private s3Service: S3Service
+    ) {}
 
   async getHotel(
     page: number,
@@ -111,6 +115,7 @@ export class HotelService {
     });
   }
 
+
   async getHotelByCategory(categoryId: string): Promise<any> {
     return await this.prismaService.hotel.findMany({
       where: {
@@ -120,6 +125,10 @@ export class HotelService {
         images: true,
       },
     });
+  }
+
+  async multiUpload(files: Express.Multer.File[]): Promise<string[]> {
+    return this.s3Service.uploadMultipleFiles(files, 'hotels/');
   }
 
   async getHotelByFilter(getHotelByFilter: GetHotelFilterDTO): Promise<any> {

@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger"
 import { IsBoolean, IsDefined, IsInt, IsNotEmpty, IsString, Max, Min } from "class-validator"
 
-export class CreateHotelDTO{
+export class CreateRoomDTO{
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
@@ -10,24 +10,15 @@ export class CreateHotelDTO{
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    address: string 
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    phoneNumber : string
+    description: string 
 
     @IsInt()
-    @Min(0)
-    @Max(5)
     @ApiProperty()
-    starRating? : number
+    price : number
 
-    
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    countryId : string
+    @IsBoolean()
+    @ApiProperty({ default: true })
+    isAvaiable: boolean = true;
 
     @IsString()
     @IsNotEmpty()
@@ -37,16 +28,20 @@ export class CreateHotelDTO{
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    checkInTime: string; // Sử dụng kiểu string cho checkInTime
+    hotelId: string
+
+
+    @IsInt()
+    @Min(0)
+    @Max(10)
+    @ApiProperty()
+    occupancy : number
+
 
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    checkOutTime: string; // Sử dụng kiểu string cho checkOutTime
+    categoryRoomId: string
 
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    cityId: string
 }
 

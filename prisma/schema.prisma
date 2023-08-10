@@ -29,12 +29,19 @@ model User {
   googleAccount GoogleAcount?
   phoneNumber   String?     
   address       String?      
-  dateOfBirth   DateTime?    
+  dateOfBirth   DateTime?  
+  socketConnection SocketConnection?  
   isActive      Boolean     @default(true) 
 
   @@map(name: "users")
 }
 
+model SocketConnection {
+  id       String @default(cuid()) @id
+  userId   String @unique
+  socketId String @unique
+  user     User   @relation(fields: [userId], references: [id])
+}
 model Notification {
   id        String       @default(cuid()) @id
   data      String
@@ -114,6 +121,8 @@ model Hotel {
   checkOutTime  DateTime?  
   extraInfo     String?
   isActive      Boolean     @default(true) 
+  city          City       @relation(fields: [cityId], references: [id]) // Thêm mối quan hệ với thành phố
+  cityId        String
   rooms         Room[]
   images        ImageHotel[]
   comments      Comment[]
@@ -133,6 +142,7 @@ model City {
   name      String
   country   Country      @relation(fields: [countryId], references: [id])
   countryId String
+  hotels    Hotel[]  
 }
 
 model Room{
@@ -141,8 +151,8 @@ model Room{
   description   String
   price         Int
   isAvaiable    Boolean 
-  category      Category     @relation(fields: [idCategory], references: [id])
-  idCategory    String
+  category      Category     @relation(fields: [categoryId], references: [id])
+  categoryId    String
   hotel         Hotel        @relation(fields: [hotelId], references: [id])
   hotelId       String
   occupancy     Int 

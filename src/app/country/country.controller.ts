@@ -17,6 +17,7 @@ import { Public } from 'src/common/decorator/public.decorator';
 export class CountryControlller {
   constructor(private countryService: CountryService) {}
 
+  @Public()
   @Get()
   async getAll(): Promise<Country[]> {
     return await this.countryService.getCountry();

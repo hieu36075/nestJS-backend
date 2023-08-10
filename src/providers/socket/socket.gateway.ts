@@ -9,7 +9,7 @@ import { Server, Socket } from 'socket.io';
 import { SocketActionService } from './socket-action.service';
 import { PrismaService } from 'src/database/prisma/prisma.service'; // Thay thế đường dẫn thật
 import { RedisService } from '@liaoliaots/nestjs-redis';
-import cuid from 'cuid';
+import * as cuid from 'cuid';
 @Injectable()
 @WebSocketGateway({ cors: true })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -24,6 +24,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   async handleConnection(socket: Socket) {
+    // console.log("connect", socket.id)
     this.pingInterval = setInterval(() => {
       socket.emit('ping', { timestamp: new Date() });
     }, 30000);
@@ -31,54 +32,42 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await this.saveUserSocketInfo(userId, socket.id);
     });
   }
-
   async handleDisconnect(socket: Socket) {
-    await this.removeUserSocketInfo(socket.id);
-    clearInterval(this.pingInterval);
+    try {
+      // console.log(socket.id)
+      await this.removeUserSocketInfo(socket.id);
+      clearInterval(this.pingInterval);
+    } catch (error) {
+      console.error("Error while removing user socket info:", error);
+    }
   }
 
   async saveUserSocketInfo(userId: string, socketId: string) {
-    // Lưu thông tin người dùng kết nối bằng Redis Sets
-    await this.redisService.getClient().sadd(`user:${userId}`, socketId);
-
-    // Lưu thông tin kết nối tới người dùng bằng Redis Sets
-    await this.redisService.getClient().sadd(`socket:${socketId}`, userId);
+    try {
+      const savedSocketConnection = await this.socketActionService.saveSocketId(userId, socketId);
+      // console.log('Socket connection saved:', savedSocketConnection);
+    } catch (error) {
+      console.error('Error saving socket connection:', error);
+    }
+    
   }
 
   async removeUserSocketInfo(socketId: string) {
-    const userIds = await this.redisService
-      .getClient()
-      .smembers(`socket:${socketId}`);
-    for (const userId of userIds) {
-      await this.redisService.getClient().srem(`user:${userId}`, socketId);
-    }
-
-    await this.redisService.getClient().del(`socket:${socketId}`);
+    return await this.socketActionService.deleteSocketId(socketId)
   }
 
-  async getUserIdBySocketId(socketId: string): Promise<string | null> {
-    const userIds = await this.redisService
-      .getClient()
-      .smembers(`socket:${socketId}`);
-    if (userIds.length > 0) {
-      return userIds[0];
-    }
-    return null;
+  async getUserIdBySocketId(socketId: string): Promise<any> {
+    return await this.socketActionService.getUserByClient(socketId);
   }
 
-  async getSocketByUserId(userId: string): Promise<string | null> {
-    const socketIds = await this.redisService
-      .getClient()
-      .smembers(`user:${userId}`);
-    if (socketIds.length > 0) {
-      return socketIds[0];
-    }
-    return null;
+  async getSocketByUserId(userId: string): Promise<any> {
+    return await this.socketActionService.getClientByUser(userId)
   }
 
   async sendNotification(userId: string, action: string, description: string) {
     try {
       const socketId = await this.getSocketByUserId(userId);
+      console.log(socketId)
       if (socketId) {
         const notificationData = {
           data: description,

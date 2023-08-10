@@ -34,7 +34,7 @@ private s3Client: S3Client;
     const command = new PutObjectCommand(params);
     const response = await this.s3Client.send(command);
     if (response.$metadata.httpStatusCode === 200) {
-        const fileUrl = `https://${this.cloundFront}/${file.originalname}`;
+        const fileUrl = `https://${this.cloundFront}/${params.Key}`;
         return fileUrl;
       } else {
         throw new Error('Lỗi khi tải lên tệp lên Amazon S3.');
@@ -58,7 +58,7 @@ private s3Client: S3Client;
       
       const command = new PutObjectCommand(params);
       const uploadPromise = this.s3Client.send(command).then(() => {
-        const fileUrl = `https://${this.cloundFront}/${file.originalname}`;
+        const fileUrl = `https://${this.cloundFront}/${params.Key}`;
         return fileUrl;
       });     
       fileUrls.push(await uploadPromise);
