@@ -8,7 +8,6 @@ import {
 import { Server, Socket } from 'socket.io';
 import { SocketActionService } from './socket-action.service';
 import { PrismaService } from 'src/database/prisma/prisma.service'; // Thay thế đường dẫn thật
-import { RedisService } from '@liaoliaots/nestjs-redis';
 import * as cuid from 'cuid';
 @Injectable()
 @WebSocketGateway({ cors: true })
@@ -18,7 +17,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private pingInterval: NodeJS.Timeout;
 
   constructor(
-    private readonly redisService: RedisService,
     private socketActionService: SocketActionService,
     private prisma: PrismaService,
   ) {}

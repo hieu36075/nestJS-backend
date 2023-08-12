@@ -8,17 +8,27 @@ import { Category, Hotel } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { CreateCategoryDTO } from './dto/create.category.dto';
 import { UpdateCategoryDTO } from './dto/update.category.dto';
+import { PaginationResult } from 'src/common/interface/pagination.interface';
 
 @Injectable()
 export class CategoriesService {
   constructor(private prismaService: PrismaService) {}
 
-  async getAll(): Promise<Category[]> {
-    return await this.prismaService.category.findMany({
-      include: {
-        hotels: true,
-      },
-    });
+  async getAll(page:number, perPage: number): Promise<PaginationResult<Category>> {
+    const totalItems = await this.prismaService.hotel.count();
+    const totalPages = Math.ceil(totalItems / perPage);
+    const skip = (page - 1) * perPage;
+    const take = parseInt(String(perPage), 10);
+    const data = await this.prismaService.category.findMany(
+      {
+        skip,
+        take,
+      }
+    );
+
+    const meta = { page, perPage, totalItems, totalPages };
+
+    return { data, meta };
   }
 
   async createCategory(

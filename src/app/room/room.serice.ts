@@ -18,7 +18,7 @@ export class RoomService {
       }
     })
 
-    if(room){
+    if(!room){
       throw new ForbiddenException('Please Check Data Again')
     }
     return room

@@ -12,5 +12,5 @@ export class AmenityService{
     async getAllAmenity():Promise<Amenity[]>{
         return await this.prismaService.amenity.findMany()
     }
-
+    
 }

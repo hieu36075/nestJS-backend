@@ -25,6 +25,7 @@ model User {
   voucher       UserVoucher[]
   comment       Comment[]
   notifications Notification[]
+  hotels         Hotel[]
   profile       Profile?
   googleAccount GoogleAcount?
   phoneNumber   String?     
@@ -117,11 +118,13 @@ model Hotel {
   starRating    Int? 
   category      Category  @relation(fields: [categoryId], references: [id])
   categoryId    String
-  checkInTime   DateTime?  
-  checkOutTime  DateTime?  
+  checkInTime   String
+  checkOutTime  String
   extraInfo     String?
   isActive      Boolean     @default(true) 
-  city          City       @relation(fields: [cityId], references: [id]) // Thêm mối quan hệ với thành phố
+  city          City        @relation(fields: [cityId], references: [id]) // Thêm mối quan hệ với thành phố
+  user          User        @relation(fields: [userId], references: [id])
+  userId        String
   cityId        String
   rooms         Room[]
   images        ImageHotel[]
@@ -150,7 +153,6 @@ model Room{
   name          String  
   description   String
   price         Int
-  isAvaiable    Boolean 
   category      Category     @relation(fields: [categoryId], references: [id])
   categoryId    String
   hotel         Hotel        @relation(fields: [hotelId], references: [id])
@@ -159,11 +161,20 @@ model Room{
   imageRoom     ImageRoom[]
   categoryRoom  CategoryRoom @relation(fields: [categoryRoomId], references: [id])
   categoryRoomId String
+  status          RoomStatus   @default(AVAILABLE)
+  expectedCheckIn DateTime?
+  expectedCheckOut DateTime?
+}
+
+enum RoomStatus {
+  AVAILABLE
+  BOOKED
+  RETURNED
 }
 
 model ImageHotel{
   id        String     @default(cuid()) @id
-  hotel     Hotel  @relation(fields: [hotelId], references: [id])
+  hotel     Hotel      @relation(fields: [hotelId], references: [id])
   hotelId   String
   url       String
 }
@@ -175,16 +186,15 @@ model Post {
   published Boolean @default(false)
   author    User?   @relation(fields: [authorId], references: [id])
   authorId  String?
-  images     ImageRoom[]
+  images     ImagePost[]
 }
 
 model ImageRoom{
   id            String       @default(cuid()) @id
-  imageUrl      String?
-  room          Room         @relation(fields: [idRoom], references: [id])
-  idRoom        String       
-  post          Post?        @relation(fields: [postId], references: [id])
-  postId        String
+  url           String
+  room          Room         @relation(fields: [roomId], references: [id])
+  roomId        String       
+
 }
 
 model ImagePost{
@@ -193,7 +203,10 @@ model ImagePost{
   description   String
   date          DateTime
   imageUrl      String?
+  post          Post?        @relation(fields: [postId], references: [id])
+  postId        String
 }
+
 
 model ImageComment {
   id            String       @default(cuid()) @id

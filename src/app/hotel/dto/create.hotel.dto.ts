@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger"
 import { IsBoolean, IsDefined, IsInt, IsNotEmpty, IsString, Max, Min } from "class-validator"
-
+import { PeekDTO } from "./amentity.hotel.dto"
 export class CreateHotelDTO{
     @IsString()
     @IsNotEmpty()
@@ -42,11 +42,26 @@ export class CreateHotelDTO{
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    checkOutTime: string; // Sử dụng kiểu string cho checkOutTime
+    
+    checkOutTime: string;// Sử dụng kiểu string cho checkOutTime
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    extraInfo: string
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    userId: string
 
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
     cityId: string
+
+    @IsNotEmpty()
+    @ApiProperty({ type: PeekDTO, isArray: true }) // Sử dụng PeekDTO và isArray: true
+    peeks: PeekDTO[];
 }
 

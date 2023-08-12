@@ -78,8 +78,10 @@ export class HotelController {
     return await this.hotelService.getHotelByCategory(categoryId);
   }
 
+  @Public()
   @Post()
   async createHotel(@Body() craeteHotelDTO: CreateHotelDTO): Promise<Hotel> {
+    console.log(craeteHotelDTO)
     return await this.hotelService.createHotel(craeteHotelDTO);
   }
 

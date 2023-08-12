@@ -23,6 +23,7 @@ import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Roles } from 'src/common/decorator';
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { Public } from 'src/common/decorator/public.decorator';
+import { PaginationResult } from 'src/common/interface/pagination.interface';
 
 @Controller('categories')
 @ApiTags('Categories')
@@ -36,8 +37,11 @@ export class CategoriesController {
   @Public()
   @Get()
   @CacheKey('items')
-  getCategories(): Promise<Category[]> {
-    return this.categoriesService.getAll();
+  getCategories(
+    @Query('page') page: number,
+    @Query('perPage') perPage: number,
+  ): Promise<PaginationResult<Category>> {
+    return this.categoriesService.getAll(page, perPage);
   }
 
   @Get('hotels/:id')

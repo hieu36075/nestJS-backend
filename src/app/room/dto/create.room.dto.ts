@@ -1,7 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsBoolean, IsDefined, IsInt, IsNotEmpty, IsString, Max, Min } from "class-validator"
+import { IsArray, IsBoolean, IsDefined, IsInt, IsNotEmpty, IsString, Max, Min } from "class-validator"
+import { ImageRoomDTO } from "./image.room.dto"
 
 export class CreateRoomDTO{
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    id: string
+
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
@@ -15,10 +21,6 @@ export class CreateRoomDTO{
     @IsInt()
     @ApiProperty()
     price : number
-
-    @IsBoolean()
-    @ApiProperty({ default: true })
-    isAvaiable: boolean = true;
 
     @IsString()
     @IsNotEmpty()
@@ -42,6 +44,5 @@ export class CreateRoomDTO{
     @IsNotEmpty()
     @ApiProperty()
     categoryRoomId: string
-
 }
 

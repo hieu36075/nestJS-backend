@@ -20,6 +20,10 @@ import { NotificationsModule } from './app/notifications/notifications.module';
 import { AmentityModule } from './app/amentity/amenity.module';
 import { RoomModule } from './app/room/room.module';
 import { CityModule } from './app/city/city.module';
+import { CategoryRoomModule } from './app/categoryRoom/categoryRoom.module';
+import { ImageHotelModule } from './app/imageHotel/imageHotel.module';
+import { ImageCommentModule } from './app/imageComment/imageCommmet.module';
+import { ImageRoomModule } from './app/imageRoom/imageRoom.module';
 
 @Module({
   imports: [
@@ -51,7 +55,11 @@ import { CityModule } from './app/city/city.module';
     NotificationsModule,
     AmentityModule,
     RoomModule,
-    CityModule
+    CityModule,
+    CategoryRoomModule,
+    ImageHotelModule,
+    ImageCommentModule,
+    ImageRoomModule
   ],
   controllers: [AppController],
   providers: [AppService],

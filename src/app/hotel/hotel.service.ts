@@ -12,6 +12,8 @@ import { PaginationResult } from 'src/common/interface/pagination.interface';
 import { GetHotelFilterDTO } from './dto/getfilter.hotel.dto';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { S3Service } from 'src/providers/aws s3/aws.s3.service';
+import * as moment from 'moment';
+
 @Injectable()
 export class HotelService {
   constructor(
@@ -65,12 +67,27 @@ export class HotelService {
   }
 
   async createHotel(@Body() createHotelDTO: CreateHotelDTO): Promise<Hotel> {
+    const { peeks, ...hotelData } = createHotelDTO;
+    // Tìm các peek dựa trên danh sách id peek
+    const peeksDataPromises = peeks.map(async (peek) => {
+      return this.prismaService.amenity.findUnique({
+        where: {
+          id: peek.id,
+        },
+      });
+    });
+    const peeksData = await Promise.all(peeksDataPromises);
+    
     return await this.prismaService.hotel.create({
       data: {
-        ...createHotelDTO,
+        ...hotelData,
+        amenities: {
+          connect: peeksData, // Kết nối với danh sách peeksData
+        },
       },
     });
   }
+  
 
   async updateHotel(
     hotelId: string,
