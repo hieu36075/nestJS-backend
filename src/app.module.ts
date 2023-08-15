@@ -24,6 +24,10 @@ import { CategoryRoomModule } from './app/categoryRoom/categoryRoom.module';
 import { ImageHotelModule } from './app/imageHotel/imageHotel.module';
 import { ImageCommentModule } from './app/imageComment/imageCommmet.module';
 import { ImageRoomModule } from './app/imageRoom/imageRoom.module';
+import { StripeModule } from './providers/stripe/stripe.module';
+import { OrderModule } from './app/order/order.module';
+import { OrderDetailsModule } from './app/orderDetails/orderDetails.module';
+import { PaymentModule } from './app/payment/payment.module';
 
 @Module({
   imports: [
@@ -34,11 +38,12 @@ import { ImageRoomModule } from './app/imageRoom/imageRoom.module';
     RedisModule.forRootAsync({
       useFactory: () => ({
         config: {
-          host: 'redis-12941.c114.us-east-1-4.ec2.cloud.redislabs.com',
+          host: process.env.REDIS_HOST,
           port: 12941,
-          password: '9y5rmF9FiWEn5kHvT0qQMt1pxafV22kn',
+          password: process.env.REDIS_PASSWORD,
         },
       }),
+      
     }),
     SocketModule,
     CacheInterceptorModule,
@@ -59,7 +64,12 @@ import { ImageRoomModule } from './app/imageRoom/imageRoom.module';
     CategoryRoomModule,
     ImageHotelModule,
     ImageCommentModule,
-    ImageRoomModule
+    ImageRoomModule,
+    PaymentModule,
+    StripeModule,
+    OrderModule,
+    OrderDetailsModule,
+
   ],
   controllers: [AppController],
   providers: [AppService],

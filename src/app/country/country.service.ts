@@ -25,8 +25,12 @@ export class CountryService {
     return { data, meta };
   }
 
-  async topCountriesWithMostHotels(): Promise<Country[]> {
-    return await this.prismaService.country.findMany({
+  async topCountriesWithMostHotels(page:number, perPage: number): Promise<PaginationResult<Country>> {
+    const totalItems = await this.prismaService.hotel.count();
+    const totalPages = Math.ceil(totalItems / perPage);
+    const skip = (page - 1) * perPage;
+    const take = parseInt(String(perPage), 10);
+    const data = await this.prismaService.country.findMany({
       include: {
         hotels: true,
       },
@@ -35,8 +39,12 @@ export class CountryService {
           _count: 'desc',
         },
       },
-      take: 3,
+      skip,
+      take,
     });
+    const meta = { page, perPage, totalItems, totalPages };
+
+    return { data, meta };
   }
 
   async createCountry(@Body() createCountryDTO: CreateCountryDTO): Promise<Country>{

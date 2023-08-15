@@ -51,7 +51,7 @@ export class HotelController {
   async Search(
     @Query('countryId') countryId?: string,
     @Query('name') name?: string,
-    @Query('caregoryId') categoryId?: string,
+    @Query('categoryId') categoryId?: string,
   ): Promise<any> {
     return await this.hotelService.getHotelByFilter({
       countryId,

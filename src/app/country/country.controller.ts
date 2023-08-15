@@ -30,9 +30,12 @@ export class CountryControlller {
 
   @Public()
   @Get('topCountry')
-  async topCountriesWithMostHotels(): Promise<Country[]> {
+  async topCountriesWithMostHotels(
+    @Query('page') page: number,
+    @Query('perPage') perPage: number,
+  ): Promise <PaginationResult<Country>> {
     // this.socketGateway.sendNotificationToClient(userId, { action: 'countryAction' });
-    return await this.countryService.topCountriesWithMostHotels();
+    return await this.countryService.topCountriesWithMostHotels(page, perPage);
   }
 
   @Post()

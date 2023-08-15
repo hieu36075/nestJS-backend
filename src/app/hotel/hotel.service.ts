@@ -56,6 +56,26 @@ export class HotelService {
       },
       include: {
         images: true,
+        amenities:true,
+        city:{
+          select:{
+            name:true,
+          },
+        },
+        country:{
+          select:{
+            name: true,
+          }
+        },
+        rooms:{
+          orderBy:{
+            price: 'asc',
+          },
+          include:{
+            imageRoom:true,
+          },
+          take:1
+        }
       },
     });
 

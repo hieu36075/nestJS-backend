@@ -164,6 +164,7 @@ model Room{
   status          RoomStatus   @default(AVAILABLE)
   expectedCheckIn DateTime?
   expectedCheckOut DateTime?
+  orderDetails    OrderDetails[]
 }
 
 enum RoomStatus {
@@ -221,21 +222,23 @@ model ImageComment {
 
 model Order{
   id            String       @default(cuid()) @id      
-  date          DateTime
+  checkIn       DateTime
+  checkOut      DateTime
   price         Int
   status        String
   user          User         @relation(fields: [userId], references: [id])
-  userId        String          
+  userId        String     
   orderdetails  OrderDetails[]
-  
 }
 
 model OrderDetails{
-  id            String       @default(cuid()) @id
-  oder          Order        @relation(fields: [orderId], references: [id]) 
+  id            String              @default(cuid()) @id
+  oder          Order               @relation(fields: [orderId], references: [id]) 
   orderId       String    
   orderStatus   OrderDetailStatus   @default(IN_PROGRESS)
-
+  room          Room                @relation(fields: [roomId], references: [id])
+  roomId        String              
+  price         Int
 }
 
 enum OrderDetailStatus {
@@ -258,5 +261,5 @@ enum VoucherStatus {
 model Voucher {
   id            String       @default(cuid()) @id  
   name          String
-  Description   String 
+  description   String 
 }
