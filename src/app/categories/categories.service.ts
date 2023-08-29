@@ -15,7 +15,7 @@ export class CategoriesService {
   constructor(private prismaService: PrismaService) {}
 
   async getAll(page:number, perPage: number): Promise<PaginationResult<Category>> {
-    const totalItems = await this.prismaService.hotel.count();
+    const totalItems = await this.prismaService.category.count();
     const totalPages = Math.ceil(totalItems / perPage);
     const skip = (page - 1) * perPage;
     const take = parseInt(String(perPage), 10);

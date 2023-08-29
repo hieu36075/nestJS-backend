@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CategoryRoomSerive } from './categoryRoom.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorator';
@@ -8,6 +8,7 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 import { Public } from 'src/common/decorator/public.decorator';
 import { PaginationResult } from 'src/common/interface/pagination.interface';
 import { CategoryRoom } from '@prisma/client';
+import { CreateCategoryRoomDTO } from './dto/create.categoryRoom.dto';
 
 @Controller('categoryRoom')
 @ApiTags('CategoryRoom')
@@ -25,5 +26,11 @@ export class CategoryRoomController {
     @Query('perPage') perPage: number,
   ): Promise<PaginationResult<CategoryRoom>>{
     return this.categoryRoomSerivce.getAll(page, perPage);
+  }
+
+  @Public()
+  @Post()
+  async createCategoryRoom(@Body() createCategoryRoomDTO: CreateCategoryRoomDTO){
+    return await this.categoryRoomSerivce.createCategoryRoom(createCategoryRoomDTO);
   }
 }

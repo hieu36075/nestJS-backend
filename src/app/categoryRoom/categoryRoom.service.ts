@@ -1,7 +1,8 @@
-import { Injectable, Query } from '@nestjs/common';
+import { Body, Injectable, Query } from '@nestjs/common';
 import { CategoryRoom } from '@prisma/client';
 import { PaginationResult } from 'src/common/interface/pagination.interface';
 import { PrismaService } from 'src/database/prisma/prisma.service';
+import { CreateCategoryRoomDTO } from './dto/create.categoryRoom.dto';
 
 @Injectable()
 export class CategoryRoomSerive {
@@ -21,5 +22,13 @@ export class CategoryRoomSerive {
     const meta = { page, perPage, totalItems, totalPages };
 
     return { data, meta };
+  }
+
+  async createCategoryRoom(createCategoryRoomDTO: CreateCategoryRoomDTO): Promise<CategoryRoom >{
+      return await this.prismaService.categoryRoom.create({
+        data:{
+          ...createCategoryRoomDTO
+        }
+      })
   }
 }

@@ -59,6 +59,7 @@ export class CreateHotelDTO{
     @IsNotEmpty()
     @ApiProperty()
     cityId: string
+    
 
     @IsNotEmpty()
     @ApiProperty({ type: PeekDTO, isArray: true }) // Sử dụng PeekDTO và isArray: true

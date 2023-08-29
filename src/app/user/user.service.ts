@@ -9,6 +9,7 @@ import { Post, User } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { SocketGateway } from 'src/providers/socket/socket.gateway';
+import { PaginationResult } from 'src/common/interface/pagination.interface';
 
 @Injectable()
 export class UserService {
@@ -18,8 +19,12 @@ export class UserService {
     private socketGateway: SocketGateway,
   ) {}
 
-  async getUser(): Promise<User[]> {
-    const users = await this.prismaService.user.findMany({
+  async getUser(page:number, perPage: number): Promise<PaginationResult<User>> {
+    const totalItems = await this.prismaService.user.count();
+    const totalPages = Math.ceil(totalItems / perPage);
+    const skip = (page - 1) * perPage;
+    const take = parseInt(String(perPage), 10);
+    const data = await this.prismaService.user.findMany({
       include: {
         profile: true,
         role: {
@@ -30,10 +35,12 @@ export class UserService {
       },
     });
     // const sanitizedUsers = users.map(user => Object.assign({}, user, { hashedPassword: undefined }));
-    users.forEach((user) => {
+    data.forEach((user) => {
       delete user.hashedPassword;
     });
-    return users;
+
+    const meta = { page, perPage, totalItems, totalPages };
+    return { data, meta };
   }
 
   async getUserById(userId: string): Promise<User> {
@@ -49,4 +56,44 @@ export class UserService {
     this.socketGateway.sendNotification(user.id, 'getUser', 'test 1');
     return user;
   }
+
+  async getUsersCountThisAndLastMonth() {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+
+    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+    const currentMonthStart = new Date(currentYear, currentMonth, 1);
+    const lastMonthStart = new Date(lastMonthYear, lastMonth, 1);
+
+    const currentMonthEnd = new Date(currentYear, currentMonth + 1, 0);
+    const lastMonthEnd = new Date(lastMonthYear, lastMonth + 1, 0);
+
+    const usersThisMonth = await this.prismaService.user.count({
+      where: {
+        createdAt: {
+          gte: currentMonthStart,
+          lt: currentMonthEnd,
+        },
+      },
+    });
+
+    const usersLastMonth = await this.prismaService.user.count({
+      where: {
+        createdAt: {
+          gte: lastMonthStart,
+          lt: lastMonthEnd,
+        },
+      },
+    });
+
+    return {
+      usersThisMonth,
+      usersLastMonth,
+    };
+  }
+
+
 }

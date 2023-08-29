@@ -5,7 +5,7 @@ import { OrderDetailsService } from "./orderDetails.service";
 @Module({
     imports:[],
     controllers:[OrderDetailsController],
-    providers:[OrderDetailsService]
+    providers:[OrderDetailsService],
 })
 
 export class OrderDetailsModule {};

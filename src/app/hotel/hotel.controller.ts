@@ -27,6 +27,7 @@ import { PaginationResult } from 'src/common/interface/pagination.interface';
 import { Public } from 'src/common/decorator/public.decorator';
 import { GetHotelFilterDTO } from './dto/getfilter.hotel.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { GetUser } from 'src/common/decorator/user.decorator';
 
 @Controller('hotel')
 @ApiTags('Hotel')
@@ -60,6 +61,14 @@ export class HotelController {
     });
   }
 
+  
+  @Get('/get-by-user')
+  async getHotelByUserId(
+    @GetUser('id') id: string, 
+    @Query('page') page:number, 
+    @Query('perPage') perPage:number){
+    return await this.hotelService.getHotelByUser(id, page, perPage)
+  }
   @Public()
   @Get(':id')
   async getById(@Param('id') hotelId: string): Promise<Hotel | null> {

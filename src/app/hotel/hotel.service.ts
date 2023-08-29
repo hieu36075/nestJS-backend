@@ -33,7 +33,7 @@ export class HotelService {
       skip,
       take,
       include: {
-        rooms: true,
+        categoryRooms: true,
         comments: true,
         amenities: true,
         images: {
@@ -50,40 +50,48 @@ export class HotelService {
   }
 
   async getHotelById(hotelId: string): Promise<Hotel | null> {
-    const hotel = await this.prismaService.hotel.findUnique({
-      where: {
-        id: hotelId, // Truyền giá trị của hotelId vào đây
-      },
-      include: {
-        images: true,
-        amenities:true,
-        city:{
-          select:{
-            name:true,
-          },
+    try{
+      const hotel = await this.prismaService.hotel.findUnique({
+          where: {
+          id: hotelId, // Truyền giá trị của hotelId vào đây
         },
-        country:{
-          select:{
-            name: true,
+        include: {
+          images: true,
+          amenities:true,
+          city:{
+            select:{
+              name:true,
+            },
+          },
+          country:{
+            select:{
+              name: true,
+            }
+          },
+          categoryRooms: true,
+          rooms:{
+            where:{
+              status: 'AVAILABLE'
+            },
+            orderBy:{
+              price: 'asc',
+            },
+            include:{
+              imageRoom:true,
+            },
+            take:1
           }
         },
-        rooms:{
-          orderBy:{
-            price: 'asc',
-          },
-          include:{
-            imageRoom:true,
-          },
-          take:1
-        }
-      },
-    });
+      });
 
-    if (!hotel) {
-      throw new ForbiddenException('Invalid Id ');
+      if (!hotel) {
+        throw new ForbiddenException('Invalid Id ');
+      }
+      
+      return hotel;
+    }catch(error){
+      throw new Error(error)
     }
-
-    return hotel;
   }
 
   async createHotel(@Body() createHotelDTO: CreateHotelDTO): Promise<Hotel> {
@@ -164,6 +172,33 @@ export class HotelService {
     });
   }
 
+  async getHotelByUser(id: string, page: number , perPage: number): Promise<PaginationResult<Hotel>>{
+    const totalItems = await this.prismaService.hotel.count();
+    const totalPages = Math.ceil(totalItems / perPage);
+    const skip = (page - 1) * perPage;
+    const take = parseInt(String(perPage), 10);
+    const data = await this.prismaService.hotel.findMany({
+      where:{
+        userId: id
+      },include:{
+        rooms:{
+          take:1
+        },
+        categoryRooms:{
+          take:1
+        },
+        images:{
+          take:1
+        }
+      },
+      skip,
+      take
+    })
+
+    const meta = { page, perPage, totalItems, totalPages };
+
+    return { data, meta };
+  }
   async multiUpload(files: Express.Multer.File[]): Promise<string[]> {
     return this.s3Service.uploadMultipleFiles(files, 'hotels/');
   }
@@ -177,6 +212,8 @@ export class HotelService {
         images: true,
       },
     });
+
+    
   }
 
   private buildFilterConditions(filter: GetHotelFilterDTO) {

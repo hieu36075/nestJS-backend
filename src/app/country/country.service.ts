@@ -47,7 +47,7 @@ export class CountryService {
     return { data, meta };
   }
 
-  async createCountry(@Body() createCountryDTO: CreateCountryDTO): Promise<Country>{
+  async createCountry(createCountryDTO: CreateCountryDTO): Promise<Country>{
     return await this.prismaService.country.create({
       data:{
         ...createCountryDTO

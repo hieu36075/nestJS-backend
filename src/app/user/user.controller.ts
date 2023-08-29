@@ -14,6 +14,8 @@ import { RolesGuard } from 'src/common/guard/roles.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { Roles } from 'src/common/decorator';
 import { GetUser } from 'src/common/decorator/user.decorator';
+import { Public } from 'src/common/decorator/public.decorator';
+import { PaginationResult } from 'src/common/interface/pagination.interface';
 
 @Controller('user')
 @ApiTags('User')
@@ -24,13 +26,22 @@ export class UserController {
   constructor(private userService: UserService) {}
   // @UseGuards(AuthGuard('jwt'))
   @Roles('Admin')
-  @Get('')
-  async getAll(): Promise<User[]> {
-    return await this.userService.getUser();
+  @Get()
+  async getAll(
+    @Query('page') page: number,
+    @Query('perPage') perPage: number,
+    ): Promise<PaginationResult<User>> {
+    return await this.userService.getUser(page, perPage);
   }
 
   @Get('getById')
   async getUserById(@GetUser('id') userId: string): Promise<User> {
     return this.userService.getUserById(userId);
+  }
+
+  @Public()
+  @Get('userInMonth')
+  async userInMonth(){
+    return this.userService.getUsersCountThisAndLastMonth();
   }
 }

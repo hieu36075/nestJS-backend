@@ -65,7 +65,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async sendNotification(userId: string, action: string, description: string) {
     try {
       const socketId = await this.getSocketByUserId(userId);
-      console.log(socketId)
       if (socketId) {
         const notificationData = {
           data: description,

@@ -98,8 +98,6 @@ export class SocketActionService {
       if(!SocketConnection){
         throw new NotFoundException("Please Check Data Again")
       };
-      console.log(SocketConnection)
-      console.log(SocketConnection.socketId)
       return SocketConnection.socketId
     } catch (error) {
       throw new Error(error.message)

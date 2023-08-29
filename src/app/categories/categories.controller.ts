@@ -36,7 +36,6 @@ export class CategoriesController {
 
   @Public()
   @Get()
-  @CacheKey('items')
   getCategories(
     @Query('page') page: number,
     @Query('perPage') perPage: number,

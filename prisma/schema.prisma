@@ -14,6 +14,8 @@ datasource db {
 model User {
   id            String       @default(cuid()) @id
   name          String?
+  firstName     String?
+  lastName      String?
   email         String?   @unique
   hashedPassword String?
   createdAt     DateTime  @default(now()) @map(name: "created_at")
@@ -91,14 +93,14 @@ model Category{
   imageUrl      String?
   hotels        Hotel[]
   rooms          Room[]
-  categoryRooms CategoryRoom[]
 }
 
 model CategoryRoom {
   id         String    @default(cuid()) @id
   name       String
-  category   Category  @relation(fields: [categoryId], references: [id])
-  categoryId String
+  hotel       Hotel  @relation(fields: [hotelId], references: [id])
+  hotelId     String
+  numberOrBeds Int
   rooms      Room[]  
 }
 
@@ -130,6 +132,8 @@ model Hotel {
   images        ImageHotel[]
   comments      Comment[]
   amenities     Amenity[]       
+  oders         Order[]
+  categoryRooms CategoryRoom[]
 }
 
 model Country{
@@ -164,6 +168,7 @@ model Room{
   status          RoomStatus   @default(AVAILABLE)
   expectedCheckIn DateTime?
   expectedCheckOut DateTime?
+  area            Int?
   orderDetails    OrderDetails[]
 }
 
@@ -225,9 +230,11 @@ model Order{
   checkIn       DateTime
   checkOut      DateTime
   price         Int
-  status        String
+  status        OrderStatus  @default(IN_PROGRESS)
   user          User         @relation(fields: [userId], references: [id])
-  userId        String     
+  userId        String    
+  hotel         Hotel         @relation(fields: [hotelId], references: [id])
+  hotelId       String
   orderdetails  OrderDetails[]
 }
 
@@ -235,13 +242,12 @@ model OrderDetails{
   id            String              @default(cuid()) @id
   oder          Order               @relation(fields: [orderId], references: [id]) 
   orderId       String    
-  orderStatus   OrderDetailStatus   @default(IN_PROGRESS)
   room          Room                @relation(fields: [roomId], references: [id])
   roomId        String              
   price         Int
 }
 
-enum OrderDetailStatus {
+enum OrderStatus {
   IN_PROGRESS 
   DONE
 }

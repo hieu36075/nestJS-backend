@@ -43,7 +43,6 @@ import { PaymentModule } from './app/payment/payment.module';
           password: process.env.REDIS_PASSWORD,
         },
       }),
-      
     }),
     SocketModule,
     CacheInterceptorModule,
@@ -69,7 +68,6 @@ import { PaymentModule } from './app/payment/payment.module';
     StripeModule,
     OrderModule,
     OrderDetailsModule,
-
   ],
   controllers: [AppController],
   providers: [AppService],
