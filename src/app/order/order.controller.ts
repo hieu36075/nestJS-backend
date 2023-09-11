@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { OrderService } from "./order.service";
 import { PaginationResult } from "src/common/interface/pagination.interface";
@@ -10,6 +10,7 @@ import { RolesGuard } from "src/common/guard/roles.guard";
 import { CacheInterceptor } from "@nestjs/cache-manager";
 import { CreateOrderDTO } from "./dto/order.create.dto";
 import { Public } from "src/common/decorator/public.decorator";
+import { UpdateOrderDTO } from "./dto/order.update.dto";
 
 @Controller('order')
 @ApiTags('Order')
@@ -77,5 +78,10 @@ export class OrderController{
     @Post()
     async createOrder(@GetUser('id') userId:string, @Body() createOrderDTO: CreateOrderDTO): Promise<Order>{
         return await this.orderService.createOrder(userId, createOrderDTO);
+    }
+    
+    @Patch()
+    async updateOrder(@Query('id') orderId: string,@Body() updateOrderDTO:UpdateOrderDTO): Promise<Order>{
+        return await this.orderService.updateOrder(orderId,updateOrderDTO);
     }
 }

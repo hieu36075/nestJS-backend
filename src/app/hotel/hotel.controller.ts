@@ -53,15 +53,27 @@ export class HotelController {
     @Query('countryId') countryId?: string,
     @Query('name') name?: string,
     @Query('categoryId') categoryId?: string,
+    @Query('occupancy') occupancy?: number, // Thêm minOccupancy
+    @Query('minPrice') minPrice?: number, 
+    @Query('maxPrice') maxPrice?: number, 
   ): Promise<any> {
     return await this.hotelService.getHotelByFilter({
       countryId,
       name,
       categoryId,
+      occupancy,
+      minPrice,
+      maxPrice
     });
   }
 
-  
+  @Public()
+  @Get('/get-hotel-by-room')
+  async getHotelByRoom(@Query('hotelId') hotelId: string, @Query('roomId') roomId: string):Promise<Hotel>{
+    return this.hotelService.getHotelByRoomId(hotelId, roomId)
+  }
+
+  @Public()
   @Get('/get-by-user')
   async getHotelByUserId(
     @GetUser('id') id: string, 

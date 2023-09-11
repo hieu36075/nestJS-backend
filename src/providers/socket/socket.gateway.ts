@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
@@ -62,6 +63,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return await this.socketActionService.getClientByUser(userId)
   }
 
+  @SubscribeMessage('sendNotification')
   async sendNotification(userId: string, action: string, description: string) {
     try {
       const socketId = await this.getSocketByUserId(userId);
@@ -80,4 +82,33 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.error('Error sending notification:', error.message);
     }
   }
+
+  @SubscribeMessage('sendNotification')
+  async sendMessage
+  (userId: string, action: string, description: string) {
+    try {
+      const socketId = await this.getSocketByUserId(userId);
+      if (socketId) {
+        const notificationData = {
+          data: description,
+          createdAt: new Date().toISOString(),
+          id: cuid(),
+          userId: userId,
+        };
+        this.server.to(socketId).emit('notification', notificationData);
+
+        await this.socketActionService.createNotification(userId, description);
+      }
+    } catch (error) {
+      console.error('Error sending notification:', error.message);
+    }
+  }
+
+  // async sendNotificationForOwner(userId: string, action: string, message: string){
+  //   try {
+  //     const socketId = await this.getSocketByUserId(userId)
+  //   } catch (error) {
+      
+  //   }
+  // }
 }

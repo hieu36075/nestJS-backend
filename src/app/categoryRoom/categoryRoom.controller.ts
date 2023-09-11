@@ -29,8 +29,20 @@ export class CategoryRoomController {
   }
 
   @Public()
+  @Get('get-by-hotel')
+  async getCategoryRoomByHotel(
+    @Query('hotelId') hotelId: string,
+    @Query('page') page: number,
+    @Query('perPage') perPage: number,
+  ): Promise<PaginationResult<CategoryRoom>>{
+    return this.categoryRoomSerivce.getByHotelId(hotelId, page, perPage);
+  }
+
+  @Public()
   @Post()
   async createCategoryRoom(@Body() createCategoryRoomDTO: CreateCategoryRoomDTO){
     return await this.categoryRoomSerivce.createCategoryRoom(createCategoryRoomDTO);
   }
+
+  
 }

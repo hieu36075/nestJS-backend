@@ -55,5 +55,16 @@ export class RoomService {
     })
   }
 
+  async getRoomByCategory(id: string): Promise<Room[]>{
+    const room = await this.prismaService.room.findMany({
+      where:{
+        categoryId: id
+      }
+    })
+    if(!room){
+      throw new ForbiddenException('Please Check Again')
+    }
+    return room
+  }
   
 }

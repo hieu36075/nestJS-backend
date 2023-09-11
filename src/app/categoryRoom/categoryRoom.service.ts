@@ -24,6 +24,27 @@ export class CategoryRoomSerive {
     return { data, meta };
   }
 
+  async getByHotelId(id: string, page: number, perPage:number): Promise<PaginationResult<CategoryRoom>>{
+    const totalItems = await this.prismaService.hotel.count();
+    const totalPages = Math.ceil(totalItems / perPage);
+    const skip = (page - 1) * perPage;
+    const take = parseInt(String(perPage), 10);
+    const data = await this.prismaService.categoryRoom.findMany(
+      {
+        where:{
+          hotelId: id
+        },include:{
+          rooms:true
+        },
+        skip,
+        take,
+      }
+    );
+
+    const meta = { page, perPage, totalItems, totalPages };
+
+    return { data, meta };
+  }
   async createCategoryRoom(createCategoryRoomDTO: CreateCategoryRoomDTO): Promise<CategoryRoom >{
       return await this.prismaService.categoryRoom.create({
         data:{
@@ -31,4 +52,6 @@ export class CategoryRoomSerive {
         }
       })
   }
+  
+
 }

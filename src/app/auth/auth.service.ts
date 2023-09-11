@@ -6,13 +6,12 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Role } from '@prisma/client';
 import { MailService } from 'src/providers/mail/mail.service';
-import { GoogleAuthDTO } from './dto/googleAuth.dto';
-import { access } from 'fs';
 import { S3Service } from 'src/providers/aws s3/aws.s3.service';
 import { createOAuth2Client } from 'src/config/google/oauth2.config';
 import { OAuth2Client, LoginTicket } from 'google-auth-library';
 import { SocketGateway } from 'src/providers/socket/socket.gateway';
 import { RedisService } from '@liaoliaots/nestjs-redis';
+import { Tokens } from './types/token.types';
 @Injectable({})
 export class AuthService {
   private readonly client: OAuth2Client;
@@ -27,7 +26,7 @@ export class AuthService {
   ) {
     this.client = createOAuth2Client();
   }
-  async register(authDTO: AuthDTO) {
+  async register(authDTO: AuthDTO) : Promise<any> {
     const hashedPassword = await argon.hash(authDTO.password);
 
     try {
@@ -45,8 +44,7 @@ export class AuthService {
           role: true,
         },
       });
-
-      return user;
+      return await this.createJwtToken(user.id, user.email, user.role.name);
     } catch (error) {
       console.log(error);
       if (error.code == 'P2002') {
@@ -85,22 +83,62 @@ export class AuthService {
     return await this.createJwtToken(user.id, user.email, user.role.name);
   }
 
+  // async refreshTokens(userId: number, rt: string): Promise<Tokens> {
+  //   const user = await this.prismaService.user.findUnique({
+  //     where: {
+  //       id: userId,
+  //     },
+  //   });
+  //   if (!user || !user.hashedRt) throw new ForbiddenException('Access Denied');
+
+  //   const rtMatches = await argon.verify(user.hashedRt, rt);
+  //   if (!rtMatches) throw new ForbiddenException('Access Denied');
+
+  //   const tokens = await this.createJwtToken(user.id, user.email);
+  //   await this.updateRtHash(user.id, tokens.refresh_token);
+
+  //   return tokens;
+  // }
+  // async updateRtHash(userId: number, rt: string): Promise<void> {
+  //   const hash = await argon.hash(rt);
+  //   await this.prismaService.user.update({
+  //     where: {
+  //       id: userId,
+  //     },
+  //     data: {
+  //       hashedRt: hash,
+  //     },
+  //   });
+  // }
+
   async createJwtToken(
     userId: string,
     email: string,
     roles: string,
-  ): Promise<{ accessToken: string }> {
+  ): Promise<Tokens> {
     const payload = {
       id: userId,
       email,
       roles,
     };
-    const jwtString = await this.jwtService.signAsync(payload, {
-      expiresIn: '30m',
-      secret: this.configService.get('JWT_SECRET'),
-    });
+    // const jwtString = await this.jwtService.signAsync(payload, {
+    //   expiresIn: '30m',
+    //   secret: this.configService.get('JWT_SECRET'),
+    // });
+
+    const [at, rt] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: this.configService.get('JWT_SECRET'),
+        expiresIn: '15m',
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: this.configService.get<string>('RT_SECRET'),
+        expiresIn: '7d',
+      }),
+    ]);
     return {
-      accessToken: jwtString,
+      access_token: at,
+      refresh_token: rt,
     };
   }
 

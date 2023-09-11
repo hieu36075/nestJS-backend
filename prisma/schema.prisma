@@ -35,7 +35,7 @@ model User {
   dateOfBirth   DateTime?  
   socketConnection SocketConnection?  
   isActive      Boolean     @default(true) 
-
+  hashedRt      String?
   @@map(name: "users")
 }
 

@@ -4,6 +4,7 @@ import { PaginationResult } from "src/common/interface/pagination.interface";
 import { PrismaService } from "src/database/prisma/prisma.service";
 import { CreateOrderDTO } from "./dto/order.create.dto";
 import { OrderDetailsService } from "../orderDetails/orderDetails.service";
+import { UpdateOrderDTO } from "./dto/order.update.dto";
 
 @Injectable()
 export class OrderService{
@@ -131,7 +132,7 @@ export class OrderService{
                 orderdetails:true,
                 hotel: true
             }
-        })
+        });
           try{
               await this.orderDetailsService.createOrderDetail({
                   orderId: order.id, 
@@ -150,6 +151,37 @@ export class OrderService{
       }catch(error){
         throw new Error("An error occurred while processing the order.");
       }
+    }
+
+    async updateOrder(orderId: string, updateOrderDTO: UpdateOrderDTO ):Promise<Order | null>{
+      const order = await this.prismaService.order.findUnique({
+        where:{
+          id: orderId,
+          status:{
+            not: 'DONE'
+          }
+        }
+      })
+      if(!order){
+        throw new ForbiddenException("Don't Have Id")
+      }
+      const newOrder = await this.prismaService.order.update({
+        where:{
+          id: order.id,
+        },
+        data:{
+          ...updateOrderDTO
+        },
+      })
+      try {
+        await this.orderDetailsService.updateOrderDetails({
+          price: newOrder.price
+        })
+        return newOrder
+      } catch (error) {
+        throw new Error(error)
+      }
+      
     }
 
     async getTotalOrdersInMonths(): Promise<{ thisMonth: number; lastMonth: number }> {

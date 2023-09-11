@@ -19,4 +19,19 @@ export class GetHotelFilterDTO{
     @IsString()
     categoryId?: string
 
+    @ApiProperty({ example: 2, description: 'The minimum occupancy required' })
+    @IsInt()
+    @Min(1)
+    occupancy?: number;
+  
+    @ApiProperty({ example: 100, description: 'The maximum price per night' })
+    @IsInt()
+    @Min(1)
+    minPrice?: number;
+
+    @ApiProperty({ example: 100, description: 'The maximum price per night' })
+    @IsInt()
+    @Min(1)
+    maxPrice?: number;
+
 }

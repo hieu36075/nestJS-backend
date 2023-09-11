@@ -41,6 +41,12 @@ export class HotelService {
             url: true,
           },
         },
+        rooms:{
+          select:{
+            name:true,
+            price:true
+          }
+        }
       },
     });
 
@@ -203,29 +209,108 @@ export class HotelService {
     return this.s3Service.uploadMultipleFiles(files, 'hotels/');
   }
 
+  async getHotelByRoomId(hotelId: string, roomId: string):Promise<Hotel>{
+    try {
+      const hotel = await this.prismaService.hotel.findUnique({
+        where:{
+          id: hotelId
+        },
+        include:{
+          rooms:{
+            where:{
+              id: roomId,
+            }
+          }
+        }
+      })
+      return hotel
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+
   async getHotelByFilter(getHotelByFilter: GetHotelFilterDTO): Promise<any> {
-    const where = this.buildFilterConditions(getHotelByFilter);
-
-    return await this.prismaService.hotel.findMany({
-      where,
-      include: {
-        images: true,
-      },
-    });
-
-    
+    try {
+      const where = this.buildFilterConditions(getHotelByFilter);
+  
+      return await this.prismaService.hotel.findMany({
+        where,
+        include: {
+          images: true,
+          rooms:{
+            where:{
+              status: 'AVAILABLE',
+            },
+            orderBy:{
+              price: 'asc'
+            },
+            select:{
+              name: true,
+              price: true, 
+            },
+          },
+          category:{
+            select:{
+              name: true
+            }
+          },
+          city:{
+            select:{
+              name: true
+            }
+          },
+          country:{
+            select:{
+              name: true
+            }
+          }
+        },
+      });
+    } catch (error) {
+      throw new Error(error)
+    }
   }
 
   private buildFilterConditions(filter: GetHotelFilterDTO) {
-    const { name, address, countryId, starRating, categoryId } = filter;
-    const where: any = {};
-
-    if (name) where['name'] = { contains: name };
-    if (address) where['address'] = address;
-    if (countryId) where['countryId'] = countryId;
-    if (starRating !== undefined) where['starRating'] = starRating;
-    if (categoryId) where['categoryId'] = categoryId;
-
-    return where;
+    try {
+      const { name, address, countryId, starRating, categoryId, occupancy, maxPrice, minPrice } = filter;
+      const where: any = {};
+  
+      if (name) where['name'] = { contains: name };
+      if (address) where['address'] = address;
+      if (countryId) where['countryId'] = countryId;
+      if (starRating !== undefined) where['starRating'] = starRating;
+      if (categoryId ) where['categoryId'] = categoryId;
+      if (occupancy !== undefined || minPrice !== undefined || maxPrice !== undefined) {
+        where['rooms'] = {
+          some: {}
+        };
+      
+        if (occupancy) {
+          where['rooms'].some.occupancy = { gte: parseInt(String(occupancy)) };
+        }
+      
+        if (minPrice !== undefined || maxPrice !== undefined) {
+          where['rooms'].some.price = {};
+      
+          if (minPrice) {
+            where['rooms'].some.price.gte = parseInt(String(minPrice)) ;
+          }
+      
+          if (maxPrice) {
+            where['rooms'].some.price.lte = parseInt(String(maxPrice)) ;
+          }
+        } else {
+          // Nếu một trong hai trống, xóa điều kiện tìm kiếm theo giá
+          delete where['rooms'].some.price;
+        }
+      }
+      
+      return where;
+      
+    } catch (error) {
+      throw new Error(error)
+    }
   }
 }
