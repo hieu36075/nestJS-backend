@@ -5,7 +5,6 @@ import { AuthModule } from './app/auth/auth.module';
 import { UserModule } from './app/user/user.module';
 import { PrismaModule } from './database/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { PostModule } from './app/post/post.module';
 import { CacheInterceptorModule } from './providers/redis/cache.interceptor';
 import { MailModule } from './providers/mail/mail.module';
 import { PassportModule } from '@nestjs/passport';
@@ -28,6 +27,8 @@ import { StripeModule } from './providers/stripe/stripe.module';
 import { OrderModule } from './app/order/order.module';
 import { OrderDetailsModule } from './app/orderDetails/orderDetails.module';
 import { PaymentModule } from './app/payment/payment.module';
+import { TaskModule } from './providers/tasks/task.module';
+import { RoomMessageModule } from './app/roomMessage/roomMessage.module';
 
 @Module({
   imports: [
@@ -44,13 +45,13 @@ import { PaymentModule } from './app/payment/payment.module';
         },
       }),
     }),
+    TaskModule,
     SocketModule,
     CacheInterceptorModule,
     MailModule,
     AuthModule,
     UserModule,
     PrismaModule,
-    PostModule,
     CategoriesModule,
     HotelModule,
     CountryModule,
@@ -68,6 +69,7 @@ import { PaymentModule } from './app/payment/payment.module';
     StripeModule,
     OrderModule,
     OrderDetailsModule,
+    RoomMessageModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -28,6 +28,7 @@ export class PaymentService{
           }
           if(existingPaymentIntent){
             if(existingPaymentIntent.status === 'requires_payment_method')
+            await this.updatePaymentIntent(existingPaymentIntent.id, paymentDTO.amount)
             return {clientSecret: existingPaymentIntent.client_secret}
           }
           const paymentIntent = await this.stripeService.createPaymentIntent(paymentDTO.amount,paymentDTO.currency, paymentDTO.orderId);
@@ -76,12 +77,18 @@ export class PaymentService{
         })
         const user = await this.prismaService.profile.findUnique({
           where:{
-            id: userId
+            userId: userId
+          }
+        })
+        const hotel = await this.prismaService.hotel.findUnique({
+          where:{
+            id: order.hotelId
           }
         })
         
         await this.socketGateway.sendNotification(userId, 'Booking', `Bạn  da dat khach san thanh cong`)
-        await this.socketGateway.sendNotification(order.hotel.userId, 'Booking', `${user.fullName}đã đặt khách sạn của bạn `)
+        await this.socketGateway.sendNotification(hotel.id, 'Booking', `${user.fullName}đã đặt khách sạn của bạn `)
+        
         return order
       } catch (error) {
         throw new Error(error)

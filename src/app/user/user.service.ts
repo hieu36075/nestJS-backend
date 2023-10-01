@@ -5,7 +5,7 @@ import {
   NotFoundException,
   Query,
 } from '@nestjs/common';
-import { Post, User } from '@prisma/client';
+import { Profile, User } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { SocketGateway } from 'src/providers/socket/socket.gateway';
@@ -53,8 +53,12 @@ export class UserService {
       throw new NotFoundException('Cannot find user with the provided ID');
     }
     delete user.hashedPassword;
-    this.socketGateway.sendNotification(user.id, 'getUser', 'test 1');
+    // this.socketGateway.sendNotification(user.id, 'getUser', 'test 1');
     return user;
+  }
+
+  async createProfile():Promise<Profile>{
+    return 
   }
 
   async getUsersCountThisAndLastMonth() {

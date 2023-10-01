@@ -165,6 +165,22 @@ export class HotelService {
       },
     });
   }
+  
+  async getHotelByRoom(hotelId: string ,roomId: string) : Promise<Hotel>{
+    return await this.prismaService.hotel.findUnique({
+      where:{
+        id: hotelId,
+        rooms:{
+          some:{
+            id: roomId
+          }
+        }
+      },
+      include:{
+        images:true
+      }
+    })
+  }
 
 
   async getHotelByCategory(categoryId: string): Promise<any> {
@@ -183,6 +199,7 @@ export class HotelService {
     const totalPages = Math.ceil(totalItems / perPage);
     const skip = (page - 1) * perPage;
     const take = parseInt(String(perPage), 10);
+    console.log(id)
     const data = await this.prismaService.hotel.findMany({
       where:{
         userId: id
@@ -220,6 +237,9 @@ export class HotelService {
             where:{
               id: roomId,
             }
+          },
+          images:{
+            take:1
           }
         }
       })

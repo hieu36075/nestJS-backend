@@ -1,26 +1,31 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsBoolean, IsDefined, IsNotEmpty, IsString } from "class-validator"
+import { IsBoolean, IsDefined, IsNotEmpty, IsNumber, IsString } from "class-validator"
 
 export class CreateProfileDTO{
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    fullName: string
+    lastName: string
 
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    address: string 
+    firstName: string
+
+    @IsString()
+    @IsDefined()
+    @ApiProperty()
+    address?: string 
 
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    phone: string 
+    phoneNumber: string 
 
     @IsString()
-    @IsNotEmpty()
+    @IsDefined()
     @ApiProperty()
-    avatarUrl: string 
+    avatarUrl?: string 
 
 
 

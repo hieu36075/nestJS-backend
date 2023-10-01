@@ -1,19 +1,27 @@
-import { Body, Injectable, NotFoundException } from '@nestjs/common';
+import { Body, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Profile } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { CreateProfileDTO } from './dto/create.profile.dto';
 import { UpdateProfileDTO } from './dto/update.profile.dto';
 
+
+
 @Injectable()
 export class ProfileService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prismaService: PrismaService) {
+    // super();
+  }
 
   async getMyProfile(userId: string): Promise<Profile> {
-    return await this.prismaService.profile.findUnique({
+    const profile =  await this.prismaService.profile.findUnique({
       where: {
         userId: userId,
       },
     });
+    if(!profile){
+      throw new ForbiddenException('Please check again')
+    }
+    return profile;
   }
 
   async createProfile(
@@ -23,6 +31,7 @@ export class ProfileService {
     return await this.prismaService.profile.create({
       data: {
         userId: userId,
+        fullName: createProfileDTO.firstName + ' '+ createProfileDTO.lastName,
         ...createProfileDTO,
       },
     });

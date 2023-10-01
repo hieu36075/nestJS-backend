@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsBoolean, IsDefined, IsInt, IsNotEmpty, IsString, Max, Min } from "class-validator"
+import { IsBoolean, IsDefined, IsInt, IsNotEmpty, IsNumber, IsString, Max, Min } from "class-validator"
 import { PeekDTO } from "./amentity.hotel.dto"
 export class CreateHotelDTO{
     @IsString()
@@ -59,7 +59,16 @@ export class CreateHotelDTO{
     @IsNotEmpty()
     @ApiProperty()
     cityId: string
-    
+
+    @IsNumber()
+    @IsDefined()
+    @ApiProperty()
+    latitude: number;  // Sử dụng kiểu number cho latitude
+  
+    @IsNumber()
+    @IsDefined()
+    @ApiProperty()
+    longitude: number;  // Sử dụng kiểu number cho longitude
 
     @IsNotEmpty()
     @ApiProperty({ type: PeekDTO, isArray: true }) // Sử dụng PeekDTO và isArray: true

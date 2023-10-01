@@ -10,166 +10,187 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id            String       @default(cuid()) @id
-  name          String?
-  firstName     String?
-  lastName      String?
-  email         String?   @unique
-  hashedPassword String?
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
-  role          Role      @relation(fields: [roleId], references: [id]) 
-  roleId        String    
-  posts         Post[]
-  oders         Order[]
-  voucher       UserVoucher[]
-  comment       Comment[]
-  notifications Notification[]
-  hotels         Hotel[]
-  profile       Profile?
-  googleAccount GoogleAcount?
-  phoneNumber   String?     
-  address       String?      
-  dateOfBirth   DateTime?  
-  socketConnection SocketConnection?  
-  isActive      Boolean     @default(true) 
-  hashedRt      String?
+  id               String            @id @default(cuid())
+  userName         String?
+  email            String?           @unique
+  hashedPassword   String?
+  createdAt        DateTime          @default(now()) @map(name: "created_at")
+  updatedAt        DateTime          @updatedAt @map(name: "updated_at")
+  role             Role              @relation(fields: [roleId], references: [id])
+  roleId           String
+  oders            Order[]
+  voucher          UserVoucher[]
+  comment          Comment[]
+  notifications    Notification[]
+  hotels           Hotel[]
+  profile          Profile?
+  dateOfBirth      DateTime?
+  socketConnection SocketConnection?
+  isActive         Boolean           @default(true)
+  hashedRt         String?
+  message          Message[]
+  userRoomMessage  UserRoomMessage[]
+
   @@map(name: "users")
 }
 
 model SocketConnection {
-  id       String @default(cuid()) @id
+  id       String @id @default(cuid())
   userId   String @unique
   socketId String @unique
   user     User   @relation(fields: [userId], references: [id])
 }
+
 model Notification {
-  id        String       @default(cuid()) @id
+  id        String   @id @default(cuid())
   data      String
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
   userId    String
+  action    String
 }
 
-model GoogleAcount {
-  id             String      @default(cuid()) @id
-  token          String
-  refreshToken   String?
-  user           User       @relation(fields: [userId], references: [id])
-  userId         String     @unique
+model RoomMessage {
+  id      String    @id @default(cuid())
+  message Message[]
+  userRoomMessage UserRoomMessage[]
 }
 
-model Role{
-  id            String       @default(cuid()) @id
-  name          String        
-  user          User[]
+model UserRoomMessage {
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  room  RoomMessage    @relation(fields: [roomId], references: [id])
+  roomId String
+}
+
+model Message {
+  id          String      @id @default(cuid())
+  content     String
+  user        User        @relation(fields: [sederId], references: [id])
+  sederId     String
+  roomMessage RoomMessage @relation(fields: [roomId], references: [id])
+  roomId      String
+  createAt    DateTime   @default(now())
+}
+
+
+
+model Role {
+  id   String @id @default(cuid())
+  name String
+  user User[]
 }
 
 model Profile {
-  id            String       @default(cuid()) @id
-  user          User         @relation(fields: [userId], references: [id])
-  userId        String       @unique
-  fullName      String
-  address       String?
-  phone         String?
-  avatarUrl     String?
+  id          String  @id @default(cuid())
+  user        User    @relation(fields: [userId], references: [id])
+  userId      String  @unique
+  firstName   String?
+  lastName    String?
+  fullName    String
+  phoneNumber String?
+  address     String?
+  avatarUrl   String?
 }
 
 model Comment {
-  id            String       @default(cuid()) @id
-  name          String
-  description   String
-  user          User         @relation(fields: [userId], references: [id])
-  userId        String
-  hohel         Hotel        @relation(fields: [hotelId], references: [id])
-  hotelId       String
-  images         ImageComment[]
+  id          String         @id @default(cuid())
+  name        String
+  description String
+  user        User           @relation(fields: [userId], references: [id])
+  userId      String
+  hohel       Hotel          @relation(fields: [hotelId], references: [id])
+  hotelId     String
+  images      ImageComment[]
 }
-model Category{
-  id            String       @default(cuid()) @id
-  name          String
-  imageUrl      String?
-  hotels        Hotel[]
-  rooms          Room[]
+
+model Category {
+  id       String  @id @default(cuid())
+  name     String
+  imageUrl String?
+  hotels   Hotel[]
+  rooms    Room[]
 }
 
 model CategoryRoom {
-  id         String    @default(cuid()) @id
-  name       String
-  hotel       Hotel  @relation(fields: [hotelId], references: [id])
-  hotelId     String
+  id           String @id @default(cuid())
+  name         String
+  hotel        Hotel  @relation(fields: [hotelId], references: [id])
+  hotelId      String
   numberOrBeds Int
-  rooms      Room[]  
+  rooms        Room[]
 }
 
-model Amenity{
-  id            String       @default(cuid()) @id
-  name          String       @unique
-  hotels        Hotel[]
+model Amenity {
+  id     String  @id @default(cuid())
+  name   String  @unique
+  hotels Hotel[]
 }
 
 model Hotel {
-  id            String       @default(cuid()) @id
+  id            String         @id @default(cuid())
   name          String
   address       String
-  country       Country   @relation(fields: [countryId], references: [id])
+  country       Country        @relation(fields: [countryId], references: [id])
   countryId     String
   phoneNumber   String
-  starRating    Int? 
-  category      Category  @relation(fields: [categoryId], references: [id])
+  starRating    Int?
+  category      Category       @relation(fields: [categoryId], references: [id])
   categoryId    String
   checkInTime   String
   checkOutTime  String
   extraInfo     String?
-  isActive      Boolean     @default(true) 
-  city          City        @relation(fields: [cityId], references: [id]) // Thêm mối quan hệ với thành phố
-  user          User        @relation(fields: [userId], references: [id])
+  isActive      Boolean        @default(true)
+  city          City           @relation(fields: [cityId], references: [id]) // Thêm mối quan hệ với thành phố
+  user          User           @relation(fields: [userId], references: [id])
   userId        String
   cityId        String
+  latitude      Float
+  longitude     Float
   rooms         Room[]
   images        ImageHotel[]
   comments      Comment[]
-  amenities     Amenity[]       
+  amenities     Amenity[]
   oders         Order[]
   categoryRooms CategoryRoom[]
 }
 
-model Country{
-  id            String       @default(cuid()) @id
-  name          String
-  image         String?
-  hotels        Hotel[] 
-  cities        City[]     
+model Country {
+  id     String  @id @default(cuid())
+  name   String
+  image  String?
+  hotels Hotel[]
+  cities City[]
 }
 
 model City {
-  id        String       @default(cuid()) @id
+  id        String  @id @default(cuid())
   name      String
-  country   Country      @relation(fields: [countryId], references: [id])
+  country   Country @relation(fields: [countryId], references: [id])
   countryId String
-  hotels    Hotel[]  
+  hotels    Hotel[]
 }
 
-model Room{
-  id            String       @default(cuid()) @id
-  name          String  
-  description   String
-  price         Int
-  category      Category     @relation(fields: [categoryId], references: [id])
-  categoryId    String
-  hotel         Hotel        @relation(fields: [hotelId], references: [id])
-  hotelId       String
-  occupancy     Int 
-  imageRoom     ImageRoom[]
-  categoryRoom  CategoryRoom @relation(fields: [categoryRoomId], references: [id])
-  categoryRoomId String
-  status          RoomStatus   @default(AVAILABLE)
-  expectedCheckIn DateTime?
+model Room {
+  id               String         @id @default(cuid())
+  name             String
+  description      String
+  price            Int
+  category         Category       @relation(fields: [categoryId], references: [id])
+  categoryId       String
+  hotel            Hotel          @relation(fields: [hotelId], references: [id])
+  hotelId          String
+  occupancy        Int
+  imageRoom        ImageRoom[]
+  categoryRoom     CategoryRoom   @relation(fields: [categoryRoomId], references: [id])
+  categoryRoomId   String
+  status           RoomStatus     @default(AVAILABLE)
+  expectedCheckIn  DateTime?
   expectedCheckOut DateTime?
-  area            Int?
-  orderDetails    OrderDetails[]
+  area             Int?
+  orderDetails     OrderDetails[]
 }
 
 enum RoomStatus {
@@ -178,94 +199,75 @@ enum RoomStatus {
   RETURNED
 }
 
-model ImageHotel{
-  id        String     @default(cuid()) @id
-  hotel     Hotel      @relation(fields: [hotelId], references: [id])
-  hotelId   String
-  url       String
+model ImageHotel {
+  id      String @id @default(cuid())
+  hotel   Hotel  @relation(fields: [hotelId], references: [id])
+  hotelId String
+  url     String
 }
 
-model Post {
-  id        String     @default(cuid()) @id
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
-  authorId  String?
-  images     ImagePost[]
+
+
+model ImageRoom {
+  id     String @id @default(cuid())
+  url    String
+  room   Room   @relation(fields: [roomId], references: [id])
+  roomId String
 }
 
-model ImageRoom{
-  id            String       @default(cuid()) @id
-  url           String
-  room          Room         @relation(fields: [roomId], references: [id])
-  roomId        String       
-
-}
-
-model ImagePost{
-  id            String       @default(cuid()) @id
-  title         String
-  description   String
-  date          DateTime
-  imageUrl      String?
-  post          Post?        @relation(fields: [postId], references: [id])
-  postId        String
-}
 
 
 model ImageComment {
-  id            String       @default(cuid()) @id
-  title         String
-  description   String
-  imageUrl      String?
-  date          DateTime
-  comment       Comment      @relation(fields: [commentId], references: [id])
-  commentId     String
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  imageUrl    String?
+  date        DateTime
+  comment     Comment  @relation(fields: [commentId], references: [id])
+  commentId   String
 }
 
-
-model Order{
-  id            String       @default(cuid()) @id      
-  checkIn       DateTime
-  checkOut      DateTime
-  price         Int
-  status        OrderStatus  @default(IN_PROGRESS)
-  user          User         @relation(fields: [userId], references: [id])
-  userId        String    
-  hotel         Hotel         @relation(fields: [hotelId], references: [id])
-  hotelId       String
-  orderdetails  OrderDetails[]
+model Order {
+  id           String         @id @default(cuid())
+  checkIn      DateTime
+  checkOut     DateTime
+  price        Int
+  status       OrderStatus    @default(IN_PROGRESS)
+  user         User           @relation(fields: [userId], references: [id])
+  userId       String
+  hotel        Hotel          @relation(fields: [hotelId], references: [id])
+  hotelId      String
+  orderdetails OrderDetails[]
 }
 
-model OrderDetails{
-  id            String              @default(cuid()) @id
-  oder          Order               @relation(fields: [orderId], references: [id]) 
-  orderId       String    
-  room          Room                @relation(fields: [roomId], references: [id])
-  roomId        String              
-  price         Int
+model OrderDetails {
+  id      String @id @default(cuid())
+  oder    Order  @relation(fields: [orderId], references: [id])
+  orderId String
+  room    Room   @relation(fields: [roomId], references: [id])
+  roomId  String
+  price   Int
 }
 
 enum OrderStatus {
-  IN_PROGRESS 
+  IN_PROGRESS
   DONE
 }
 
-model UserVoucher{
-  id            String       @default(cuid()) @id   
-  user          User         @relation(fields: [userId], references: [id])
-  userId        String
-  status        VoucherStatus @default(isAvaiable)
+model UserVoucher {
+  id     String        @id @default(cuid())
+  user   User          @relation(fields: [userId], references: [id])
+  userId String
+  status VoucherStatus @default(isAvaiable)
 }
 
 enum VoucherStatus {
   isAvaiable
-  avaiable 
+  avaiable
 }
 
 model Voucher {
-  id            String       @default(cuid()) @id  
-  name          String
-  description   String 
+  id          String @id @default(cuid())
+  name        String
+  description String
 }

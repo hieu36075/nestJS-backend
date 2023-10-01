@@ -12,38 +12,47 @@ import { OAuth2Client, LoginTicket } from 'google-auth-library';
 import { SocketGateway } from 'src/providers/socket/socket.gateway';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { Tokens } from './types/token.types';
+import { String } from 'aws-sdk/clients/appstream';
+import { ProfileService } from '../profile/profile.service';
+import { RegisterDTO } from './dto/register.dto';
+
+
 @Injectable({})
 export class AuthService {
   private readonly client: OAuth2Client;
   constructor(
     private readonly socketGateway: SocketGateway,
     private readonly redisService: RedisService,
+    private  profileService:ProfileService,
     private prismaService: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
     private mailService: MailService,
     private s3Service: S3Service,
+
   ) {
     this.client = createOAuth2Client();
   }
-  async register(authDTO: AuthDTO) : Promise<any> {
-    const hashedPassword = await argon.hash(authDTO.password);
-
+  async register(registerDTO: RegisterDTO) : Promise<any> {
+    const {email, password, userName, ...registerData } = registerDTO
+    const hashedPassword = await argon.hash(registerDTO.password);
     try {
       const user = await this.prismaService.user.create({
         data: {
-          email: authDTO.email,
+          email: registerDTO.email,
           hashedPassword: hashedPassword,
           roleId: 'clgywq0h8000308l3a38y39t6',
+          userName: registerDTO.userName
         },
         select: {
           id: true,
-          name: true,
+          userName: true,
           email: true,
           createdAt: true,
           role: true,
         },
       });
+      await this.profileService.createProfile(user.id, registerData)
       return await this.createJwtToken(user.id, user.email, user.role.name);
     } catch (error) {
       console.log(error);
@@ -80,36 +89,55 @@ export class AuthService {
     // return user
     // console.log(user)
     // console.log("test mobile")
-    return await this.createJwtToken(user.id, user.email, user.role.name);
+    const token =  await this.createJwtToken(user.id, user.email, user.role.name);
+    await this.updateRtHash(user.id, token.refresh_token)
+    return token
   }
 
-  // async refreshTokens(userId: number, rt: string): Promise<Tokens> {
-  //   const user = await this.prismaService.user.findUnique({
-  //     where: {
-  //       id: userId,
-  //     },
-  //   });
-  //   if (!user || !user.hashedRt) throw new ForbiddenException('Access Denied');
+  async refreshTokens(userId: string, rt: string): Promise<Tokens> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId, // Sử dụng kiểu dữ liệu phù hợp: userId là string
+      },
+      include: {
+        role: {
+          select: {
+            name: true
+          }
+        }
+      }
+    });
+  
+    if (!user || !user.hashedRt) throw new ForbiddenException('Access Denied');
+  
+    const rtMatches = await argon.verify(user.hashedRt, rt);
+    if (!rtMatches) throw new ForbiddenException('Access Denied');
+  
+    const tokens = await this.createJwtToken(user.id, user.email, user.role.name);
+    await this.updateRtHash(user.id, tokens.refresh_token);
+  
+    return tokens;
+  }
 
-  //   const rtMatches = await argon.verify(user.hashedRt, rt);
-  //   if (!rtMatches) throw new ForbiddenException('Access Denied');
-
-  //   const tokens = await this.createJwtToken(user.id, user.email);
-  //   await this.updateRtHash(user.id, tokens.refresh_token);
-
-  //   return tokens;
-  // }
-  // async updateRtHash(userId: number, rt: string): Promise<void> {
-  //   const hash = await argon.hash(rt);
-  //   await this.prismaService.user.update({
-  //     where: {
-  //       id: userId,
-  //     },
-  //     data: {
-  //       hashedRt: hash,
-  //     },
-  //   });
-  // }
+  async updateRtHash(userId: string, rt: string): Promise<void> {
+    const hash = await argon.hash(rt);
+    await this.prismaService.user.update({
+      where:{
+        id: userId
+      },
+      data:{
+        hashedRt: hash,
+      }
+    })
+    // await this.prismaService.user.update({
+    //   where: {
+    //     id: userId,
+    //   },
+    //   data: {
+    //     hashedRt: hash,
+    //   },
+    // });
+  }
 
   async createJwtToken(
     userId: string,
@@ -129,7 +157,7 @@ export class AuthService {
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.configService.get('JWT_SECRET'),
-        expiresIn: '15m',
+        expiresIn: '1d',
       }),
       this.jwtService.signAsync(payload, {
         secret: this.configService.get<string>('RT_SECRET'),
@@ -170,7 +198,7 @@ export class AuthService {
       const newUser = await this.prismaService.user.create({
         data: {
           email: email,
-          name: name,
+          userName: name,
           roleId: 'clgywq0h8000308l3a38y39t6',
           profile: {
             create: {

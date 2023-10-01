@@ -5,12 +5,14 @@ import { PrismaService } from "src/database/prisma/prisma.service";
 import { CreateOrderDTO } from "./dto/order.create.dto";
 import { OrderDetailsService } from "../orderDetails/orderDetails.service";
 import { UpdateOrderDTO } from "./dto/order.update.dto";
+import { SocketGateway } from "src/providers/socket/socket.gateway";
 
 @Injectable()
 export class OrderService{
     constructor(
         private prismaService: PrismaService,
-        private orderDetailsService : OrderDetailsService
+        private orderDetailsService : OrderDetailsService,
+        private socketGateway: SocketGateway
     ){}
 
     async getOrder(page:number, perPage:number): Promise<PaginationResult<Order>>{
@@ -86,6 +88,7 @@ export class OrderService{
 
 
     async createOrder(userId: string, @Body() createOrderDTO: CreateOrderDTO):Promise<Order>{
+    
         const { roomId,hotelId, ...orderData } = createOrderDTO;
         try{
 
@@ -108,7 +111,6 @@ export class OrderService{
         });
 
         if(existingOrder){
-          console.log("thanh cong");
           return existingOrder;
         }
 
@@ -149,7 +151,7 @@ export class OrderService{
             throw new Error("failed to create OrderDetails");
           }
       }catch(error){
-        throw new Error("An error occurred while processing the order.");
+        throw new Error(error);
       }
     }
 
@@ -183,6 +185,37 @@ export class OrderService{
       }
       
     }
+
+    async confirmOrder(userId: string, orderId: string) : Promise<Order>{
+      try {
+          const order = await this.prismaService.order.update({
+            where:{
+              id: orderId
+            },
+            data:{
+              status:'DONE'
+            },
+          })
+          const user = await this.prismaService.profile.findUnique({
+            where:{
+              userId: userId
+            }
+          })
+          const hotel = await this.prismaService.hotel.findUnique({
+            where:{
+              id: order.hotelId
+            }
+          })
+          
+          await this.socketGateway.sendNotification(userId, 'Booking', `Bạn  da dat khach san thanh cong`)
+          await this.socketGateway.sendNotification(hotel.userId, 'Booking', `${user.fullName}đã đặt khách sạn của bạn `)
+          
+          return order
+        } catch (error) {
+          throw new Error(error)
+        }
+      }
+  
 
     async getTotalOrdersInMonths(): Promise<{ thisMonth: number; lastMonth: number }> {
         const currentDate = new Date();

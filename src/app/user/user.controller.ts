@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Param,
   Query,
   UseGuards,
   UseInterceptors,
@@ -34,9 +35,15 @@ export class UserController {
     return await this.userService.getUser(page, perPage);
   }
 
-  @Get('getById')
+  @Get('get-your-profile')
   async getUserById(@GetUser('id') userId: string): Promise<User> {
     return this.userService.getUserById(userId);
+  }
+
+  @Public()
+  @Get(':id')
+  async getUser(@Param('id') userId: string): Promise<User>{
+    return this.userService.getUserById(userId)
   }
 
   @Public()

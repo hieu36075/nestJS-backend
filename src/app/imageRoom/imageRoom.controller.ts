@@ -13,7 +13,6 @@ export class ImageRoomController{
 
     @Post()
     async createImageRoom(@Body() createImageRoomDTO: CreateImageRoomDTO):Promise<ImageRoom>{
-        console.log(createImageRoomDTO)
         return await this.imageRoomService.createImage(createImageRoomDTO)
     }
 }

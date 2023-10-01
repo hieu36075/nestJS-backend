@@ -73,7 +73,7 @@ export class HotelController {
     return this.hotelService.getHotelByRoomId(hotelId, roomId)
   }
 
-  @Public()
+  // @Public()
   @Get('/get-by-user')
   async getHotelByUserId(
     @GetUser('id') id: string, 
@@ -99,10 +99,16 @@ export class HotelController {
     return await this.hotelService.getHotelByCategory(categoryId);
   }
 
+  // @Public()
+  // @Get('/get-hotel-by-room')
+  // async getHotelByRoom(@Query('hotelId') hotelId: string, @Query('roomId') roomId: string): Promise<any> {
+  //   return await this.hotelService.getHotelByRoomId(categoryId);
+  // }
+  
+
   @Public()
   @Post()
   async createHotel(@Body() craeteHotelDTO: CreateHotelDTO): Promise<Hotel> {
-    console.log(craeteHotelDTO)
     return await this.hotelService.createHotel(craeteHotelDTO);
   }
 

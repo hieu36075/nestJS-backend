@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { GetUser } from 'src/common/decorator/user.decorator';
 import { Profile } from '@prisma/client';
@@ -17,6 +17,11 @@ export class ProfileController {
 
   @Get()
   async getMyProfile(@GetUser('id') userId: string): Promise<Profile> {
+    return await this.profileService.getMyProfile(userId);
+  }
+
+  @Get(':id')
+  async getById(@Param('id') userId: string): Promise<Profile>{
     return await this.profileService.getMyProfile(userId);
   }
 

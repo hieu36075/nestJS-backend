@@ -13,7 +13,6 @@ export class ImageHotelController{
 
     @Post()
     async createImageHotel(@Body() createImageHotelDTO: CreateImageHotelDTO): Promise<ImageHotel>{
-        // console.log(createImageHotelDTO)
         return await this.imageHotelService.createImage(createImageHotelDTO)
     }
 }

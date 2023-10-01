@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CategoryRoomSerive } from './categoryRoom.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorator';
@@ -37,7 +37,11 @@ export class CategoryRoomController {
   ): Promise<PaginationResult<CategoryRoom>>{
     return this.categoryRoomSerivce.getByHotelId(hotelId, page, perPage);
   }
-
+  @Public()
+  @Get(':id')
+  async getCategoryRoomById(@Param('id') id:string): Promise<CategoryRoom>{
+    return await this.categoryRoomSerivce.getCategoryRoomById(id)
+  }
   @Public()
   @Post()
   async createCategoryRoom(@Body() createCategoryRoomDTO: CreateCategoryRoomDTO){

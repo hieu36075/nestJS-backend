@@ -16,6 +16,7 @@ import { AuthService } from './auth.service';
 import { AuthDTO } from './dto';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -23,9 +24,18 @@ import { MyJwtGuard } from 'src/common/guard';
 import { Role } from '@prisma/client';
 import { MailService } from 'src/providers/mail/mail.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { GetUser } from 'src/common/decorator/user.decorator';
+import { GetRefreshToken } from 'src/common/decorator/token.decorator';
+import { RtStrategy } from 'src/common/strategy/rt.strategy';
+import { Public } from 'src/common/decorator/public.decorator';
+import { Tokens } from './types/token.types';
+import { RtGuard } from 'src/common/guard/rt.guard';
+import { RegisterDTO } from './dto/register.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(MyJwtGuard)
 export class AuthController {
   constructor(private authService: AuthService) {}
 
@@ -34,11 +44,13 @@ export class AuthController {
     return await this.authService.viewRole();
   }
 
+  @Public()
   @Post('register')
-  register(@Body() authDTO: AuthDTO) {
-    return this.authService.register(authDTO);
+  register(@Body() registerDTO: RegisterDTO) {
+    return this.authService.register(registerDTO);
   }
 
+  @Public()
   @Post('login')
   login(@Body() authDTO: AuthDTO) {
     return this.authService.login(authDTO);
@@ -48,6 +60,13 @@ export class AuthController {
   async loginByGoogle(@Body('token') token: string): Promise<any> {
     const ticket = await this.authService.verifyGoogleIdToken(token);
     return ticket;
+  }
+
+  @Public()
+  @UseGuards(RtGuard)
+  @Post('refresh')
+  async refreshTokens(@GetUser('id') userId:string , @GetRefreshToken('refreshToken') refreshToken: string) : Promise<Tokens>{
+    return await this.authService.refreshTokens(userId, refreshToken) 
   }
 
   @Get('mail')

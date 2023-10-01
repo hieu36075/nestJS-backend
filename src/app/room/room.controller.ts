@@ -28,7 +28,7 @@ export class RoomController {
   async getByCategory(@Query('id') id: string): Promise<Room[]>{
     return await this.roomService.getRoomByCategory(id);
   }
-  @Get('id')
+  @Get(':id')
   async getById(@Param('id') roomId: string): Promise<Room | null>{
     return await this.roomService.getRoomById(roomId);
   }

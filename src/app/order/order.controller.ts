@@ -77,11 +77,17 @@ export class OrderController{
 
     @Post()
     async createOrder(@GetUser('id') userId:string, @Body() createOrderDTO: CreateOrderDTO): Promise<Order>{
+    //    console.log(createOrderDTO)
         return await this.orderService.createOrder(userId, createOrderDTO);
     }
     
     @Patch()
     async updateOrder(@Query('id') orderId: string,@Body() updateOrderDTO:UpdateOrderDTO): Promise<Order>{
         return await this.orderService.updateOrder(orderId,updateOrderDTO);
+    }
+
+    @Patch('confirm-order/:id')
+    async confirmOrder(@GetUser('id') userId: string, @Param('id') orderId: string): Promise<Order>{
+        return await this.orderService.confirmOrder(userId, orderId)
     }
 }

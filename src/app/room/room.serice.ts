@@ -25,6 +25,14 @@ export class RoomService {
   }
 
   async creteRoom(@Body() createRoomDTO: CreateRoomDTO): Promise<Room>{
+    const room = await this.prismaService.room.findUnique({
+      where:{
+        id: createRoomDTO.id
+      }
+    })
+    if(room){
+      return room
+    }
     return await this.prismaService.room.create({
       data:{
         ...createRoomDTO,

@@ -22,7 +22,7 @@ export class PaymentController{
 
     @Post('create-payment-intent')
     async createPaymentIntent(@Body() paymentDTO: PaymentDTO) {
-        // console.log(paymentDTO)
+
         return await this.paymentService.createPaymentIntent(paymentDTO);
     }
 

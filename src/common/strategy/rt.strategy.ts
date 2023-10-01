@@ -6,7 +6,7 @@ import { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
 
 @Injectable()
-export class RtStrategy extends PassportStrategy(Strategy, 'jwt'){
+export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh'){
     constructor(
         configService : ConfigService
     ){
@@ -21,7 +21,6 @@ export class RtStrategy extends PassportStrategy(Strategy, 'jwt'){
         ?.get('authorization')
         ?.replace('Bearer', '')
         .trim();
-  
       if (!refreshToken) throw new ForbiddenException('Refresh token malformed');
   
       return {
