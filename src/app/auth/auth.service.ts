@@ -53,6 +53,10 @@ export class AuthService {
         },
       });
       await this.profileService.createProfile(user.id, registerData)
+      await this.mailService.sendEmail(user.email, 
+        'hieutcgcd191045@fpt.edu.vn', 
+        'You have created a travel account', 
+        'Thanks for service')
       return await this.createJwtToken(user.id, user.email, user.role.name);
     } catch (error) {
       console.log(error);

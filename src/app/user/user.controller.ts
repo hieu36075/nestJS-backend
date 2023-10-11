@@ -39,16 +39,16 @@ export class UserController {
   async getUserById(@GetUser('id') userId: string): Promise<User> {
     return this.userService.getUserById(userId);
   }
-
+  
+  @Public()
+  @Get('userInMonth')
+  async userInMonth(){
+    return this.userService.getUsersCountThisAndLastMonth();
+  }
   @Public()
   @Get(':id')
   async getUser(@Param('id') userId: string): Promise<User>{
     return this.userService.getUserById(userId)
   }
 
-  @Public()
-  @Get('userInMonth')
-  async userInMonth(){
-    return this.userService.getUsersCountThisAndLastMonth();
-  }
 }

@@ -48,7 +48,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     socket.on('joinRoom', (roomId) => {
       socket.join(roomId); // Tham gia phòng được chỉ định
-       // Gửi thông báo cho tất cả người dùng trong phòng
     });
   }
   async handleDisconnect(socket: Socket) {
@@ -89,18 +88,28 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // }
   // @UseGuards(WsGuard) 
   @SubscribeMessage('sendNotification')
-  async sendNotification(userId: string, type: string, description: string) {
+  async sendNotificationWithClient(client: Socket, payload: any) {
+    const { userId, description, action, id } = payload;
+
+
+  try {
+    const socketId = await this.getSocketByUserId(userId);
+    if (socketId) {
+      const notificationData = await this.socketActionService.createNotification(userId, description, action, id);
+      this.server.to(socketId).emit('notification', notificationData);
+    }
+  } catch (error) {
+    console.error('Error sending notification:', error.message);
+  }
+  }
+
+  // @SubscribeMessage('sendNotification')
+  async sendNotification(userId: string, description: string,action: string, id: string) {
+    console.log(userId)
     try {
       const socketId = await this.getSocketByUserId(userId);
       if (socketId) {
-        // const notificationData = {
-        //   data: description,
-        //   createdAt: new Date().toISOString(),
-        //   id: cuid(),
-        //   userId: userId,
-        // };
-        
-        const notificationData = await this.socketActionService.createNotification(userId, description, type);
+        const notificationData = await this.socketActionService.createNotification(userId, description, action, id);
         this.server.to(socketId).emit('notification', notificationData);
       }
     } catch (error) {
@@ -117,32 +126,47 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // console.log('User:', user);
     // socket.emit('received_message',{
     //   message,
-    // })
+    // }))
+    console.log('abc')
     if(!user.id || !message.userId){
       throw new ForbiddenException('Please check again')
     }
+    const seederId = await this.getSocketByUserId(user.id);
+    const receivedId = await this.getSocketByUserId(message.userId);
     let roomId: string;
     const checkRoom = await this.roomMessageService.checkRoom(user.id, message.userId)
     if(!checkRoom){
         const roomMessage = await this.roomMessageService.createRoom();
         roomId = roomMessage.id
         await this.userRoomMessageService.create(user.id, roomMessage.id)
-        await this.userRoomMessageService.create(message.id, roomMessage.id)
+        await this.userRoomMessageService.create(message.userId, roomMessage.id)
     }else{
       roomId= checkRoom.id
     }
-    // const newMessage = await this.messageService.createMessage(
-    //   message.content, 
-    //   user.id, 
-    //   roomId
-    //   );
-    this.server.to(roomId).emit('message-received',{
-      newMessage:'asdd'
-    })
-    // socket.broadcast.to(roomId).emit('message-received', {content: 'chay roi'})
+    const newMessage = await this.messageService.createMessage(
+      message.content, 
+      user.id, 
+      roomId
+      );
+    const newRoom = await this.roomMessageService.checkRoomId(roomId)
     
-  }
+    if(!checkRoom){
+      this.server.to(seederId).emit('newRoom-received',{
+        newRoom
+      })
+  
+      this.server.to(receivedId).emit('newRoom-received',{
+        newRoom
+      })
+      return
+    }
 
+    this.server.to(roomId).emit('message-received',{
+      roomId: roomId,
+      newMessage
+    })  
+  }
+  
   @UseGuards(WsGuard)
   @SubscribeMessage('sendMessage')
   async sendMessageWithRoomId
@@ -151,7 +175,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @ConnectedSocket() socket: Socket,
   @GetUser() user: any
   ) {
-
+    console.log('av')
     const roomMessage = await this.roomMessageService.checkRoomId(message.roomId)
     if(!roomMessage){
       throw new ForbiddenException('Please Check Again')

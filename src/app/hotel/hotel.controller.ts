@@ -87,6 +87,11 @@ export class HotelController {
     return await this.hotelService.getHotelById(hotelId);
   }
 
+  @Get(':hotelId/users')
+  async getUsersForHotel(@Param('hotelId') hotelId: string,  @Query('page') page: number,
+  @Query('perPage') perPage: number, ) {
+    return this.hotelService.getUsersForHotel(hotelId, page ,perPage);
+  }
   @Public()
   @Get('/get-hotel-by-country/:id')
   async getHotelByCountry(@Param('id') countryId: string): Promise<any> {
@@ -98,7 +103,16 @@ export class HotelController {
   async getHotelByCategory(@Param('id') categoryId: string): Promise<any> {
     return await this.hotelService.getHotelByCategory(categoryId);
   }
+  
+  @Get('/:hotelId/user-in-month')
+  async getReservationsCountByHotel(
+    @Param('hotelId') hotelId: string,
+  ): Promise<number[]> {
 
+    return await this.hotelService.getReservationsCountByHotel(hotelId);
+
+
+  }
   // @Public()
   // @Get('/get-hotel-by-room')
   // async getHotelByRoom(@Query('hotelId') hotelId: string, @Query('roomId') roomId: string): Promise<any> {

@@ -5,7 +5,17 @@ export class UpdateProfileDTO{
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    fullName?: string
+    firstName?: string
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    lastName?: string
+
+    // @IsString()
+    // @IsNotEmpty()
+    // @ApiProperty()
+    // fullName?: string
 
     @IsString()
     @IsNotEmpty()
@@ -15,7 +25,7 @@ export class UpdateProfileDTO{
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    phone?: string 
+    phoneNumber?: string 
 
     @IsString()
     @IsNotEmpty()

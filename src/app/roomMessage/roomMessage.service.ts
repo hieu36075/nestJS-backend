@@ -78,9 +78,6 @@ export class RoomMessageService{
                 }
             }
         }) 
-        if(!room){
-            throw new ForbiddenException('Please check again')
-        }
         return room || null
     }
 
@@ -113,6 +110,10 @@ export class RoomMessageService{
         return await this.prismaService.roomMessage.findUnique({
             where:{
                 id: id
+            },
+            include:{
+                message:true,
+                userRoomMessage:true
             }
         })
     }

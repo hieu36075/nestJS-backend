@@ -207,8 +207,8 @@ export class OrderService{
             }
           })
           
-          await this.socketGateway.sendNotification(userId, 'Booking', `Bạn  da dat khach san thanh cong`)
-          await this.socketGateway.sendNotification(hotel.userId, 'Booking', `${user.fullName}đã đặt khách sạn của bạn `)
+          await this.socketGateway.sendNotification(userId, `You have successfully won the hotel`, 'action_booking_hotel', order.id)
+          await this.socketGateway.sendNotification(hotel.userId, `${user.fullName} has booked your hotel`, 'action_view_booking_hotel', hotel.id)
           
           return order
         } catch (error) {

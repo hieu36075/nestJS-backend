@@ -13,12 +13,14 @@ import { GetHotelFilterDTO } from './dto/getfilter.hotel.dto';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { S3Service } from 'src/providers/aws s3/aws.s3.service';
 import * as moment from 'moment';
+import { SocketGateway } from 'src/providers/socket/socket.gateway';
 
 @Injectable()
 export class HotelService {
   constructor(
     private prismaService: PrismaService,
-    private s3Service: S3Service
+    private s3Service: S3Service,
+    private socketGateway: SocketGateway
     ) {}
 
   async getHotel(
@@ -112,7 +114,7 @@ export class HotelService {
     });
     const peeksData = await Promise.all(peeksDataPromises);
     
-    return await this.prismaService.hotel.create({
+    const hotel =  await this.prismaService.hotel.create({
       data: {
         ...hotelData,
         amenities: {
@@ -120,6 +122,8 @@ export class HotelService {
         },
       },
     });
+    // await this.socketGateway.sendNotification(hotel.userId, 'Create Hotel Succces')
+    return hotel
   }
   
 
@@ -199,7 +203,6 @@ export class HotelService {
     const totalPages = Math.ceil(totalItems / perPage);
     const skip = (page - 1) * perPage;
     const take = parseInt(String(perPage), 10);
-    console.log(id)
     const data = await this.prismaService.hotel.findMany({
       where:{
         userId: id
@@ -332,5 +335,78 @@ export class HotelService {
     } catch (error) {
       throw new Error(error)
     }
+  }
+
+  async getUsersForHotel(hotelId: string, page: number, perPage: number) : Promise<any> {
+    const totalItems = await this.prismaService.hotel.count();
+    const totalPages = Math.ceil(totalItems / perPage);
+    const skip = (page - 1) * perPage;
+    const take = parseInt(String(perPage), 10);
+    const usersWithInfo = await this.prismaService.order.findMany({
+      where: {
+        hotelId,
+      },
+      select: {
+        user: {
+          select: {
+            id: true,
+            userName: true,
+            email: true,
+            profile: {
+              select: {
+                avatarUrl: true,
+                phoneNumber: true,
+                fullName: true
+              },
+            },
+          },
+        },
+        status: true, 
+        id: true
+      },
+      skip,
+      take,
+      distinct: ['userId'], // Ensure unique users
+    });
+
+    const user =  usersWithInfo.map((order) => ({
+      id: order.id,
+      userId: order.user.id,
+      fullName: order.user.profile?.fullName || null,
+      email: order.user.email,
+      avatarUrl: order.user.profile?.avatarUrl || null, // Avatar người dùng
+      phoneNumber: order.user.profile?.phoneNumber || null, // Số điện thoại người dùng
+      orderStatus: order.status, // Trạng thái order
+    }))
+    const meta = { page, perPage, totalItems, totalPages };
+    return {user,meta}
+  }
+  
+
+  async getReservationsCountByHotel(hotelId: string): Promise<any> {
+    const today = new Date();
+    const lastMonth = new Date();
+    lastMonth.setMonth(today.getMonth() - 1);
+
+    const usersThisMonth = await this.prismaService.order.count({
+      where: {
+        hotelId,
+        checkIn: {
+          gte: new Date(today.getFullYear(), today.getMonth(), 1),
+        },
+      },
+    });
+
+    const usersLastMonth = await this.prismaService.order.count({
+      where: {
+        hotelId,
+        checkIn: {
+          gte: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1),
+          lt: new Date(today.getFullYear(), today.getMonth(), 1),
+        },
+      },
+    });
+
+    return {usersThisMonth, usersLastMonth};
   }
 }

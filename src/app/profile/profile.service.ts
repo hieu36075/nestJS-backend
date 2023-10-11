@@ -57,6 +57,7 @@ export class ProfileService {
       },
       data: {
         ...updateProfileDTO,
+        fullName: updateProfileDTO.lastName + ' ' + updateProfileDTO.firstName
       },
     });
     return newPost;

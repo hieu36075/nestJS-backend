@@ -30,6 +30,7 @@ export class ProfileController {
     @GetUser('id') userId: string,
     @Body() createProfileDTO: CreateProfileDTO,
   ): Promise<Profile> {
+
     return await this.profileService.createProfile(userId, createProfileDTO);
   }
 
@@ -38,6 +39,7 @@ export class ProfileController {
     @GetUser('id') userId: string,
     @Body() updateProfileDTO: UpdateProfileDTO,
   ): Promise<Profile> {
+    console.log(updateProfileDTO);
     return await this.profileService.updateProfile(userId, updateProfileDTO);
   }
 }

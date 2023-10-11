@@ -104,12 +104,13 @@ export class SocketActionService {
     }
   }
 
-  async createNotification(userId: string, data: any, type: string) {
+  async createNotification(userId: string, data: any, type: string, id: string) {
     const notification = await this.prismaService.notification.create({
       data: {
         data: data,
         userId: userId,
-        action: type
+        action: type,
+        actionId: id
       },
     });
 

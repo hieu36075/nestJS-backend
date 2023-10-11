@@ -26,7 +26,7 @@ export class UserRoomMessageService{
         return await this.prismaService.userRoomMessage.create({
             data:{
                 userId: userId,
-                roomId: roomId
+                roomId: roomId,
             }
         })
     }

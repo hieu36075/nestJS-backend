@@ -86,8 +86,8 @@ export class PaymentService{
           }
         })
         
-        await this.socketGateway.sendNotification(userId, 'Booking', `Bạn  da dat khach san thanh cong`)
-        await this.socketGateway.sendNotification(hotel.id, 'Booking', `${user.fullName}đã đặt khách sạn của bạn `)
+        // await this.socketGateway.sendNotification(userId, 'Booking', `Bạn  da dat khach san thanh cong`)
+        // await this.socketGateway.sendNotification(hotel.id, 'Booking', `${user.fullName}đã đặt khách sạn của bạn `)
         
         return order
       } catch (error) {
