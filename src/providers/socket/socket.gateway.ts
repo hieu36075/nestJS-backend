@@ -47,7 +47,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
 
     socket.on('joinRoom', (roomId) => {
-      socket.join(roomId); // Tham gia phòng được chỉ định
+      socket.join(roomId); 
     });
   }
   async handleDisconnect(socket: Socket) {
@@ -175,7 +175,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @ConnectedSocket() socket: Socket,
   @GetUser() user: any
   ) {
-    console.log('av')
     const roomMessage = await this.roomMessageService.checkRoomId(message.roomId)
     if(!roomMessage){
       throw new ForbiddenException('Please Check Again')

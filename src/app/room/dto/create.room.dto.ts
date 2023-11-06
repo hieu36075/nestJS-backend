@@ -3,10 +3,8 @@ import { IsArray, IsBoolean, IsDefined, IsInt, IsNotEmpty, IsString, Max, Min } 
 import { ImageRoomDTO } from "./image.room.dto"
 
 export class CreateRoomDTO{
-    @IsString()
-    @IsNotEmpty()
     @ApiProperty()
-    id: string
+    id?: string
 
     @IsString()
     @IsNotEmpty()
@@ -21,11 +19,6 @@ export class CreateRoomDTO{
     @IsInt()
     @ApiProperty()
     price : number
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    categoryId: string
 
     @IsString()
     @IsNotEmpty()

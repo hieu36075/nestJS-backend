@@ -15,6 +15,9 @@ export class RoomService {
     const room = await this.prismaService.room.findUnique({
       where:{
         id: id
+      },
+      include:{
+        imageRoom:true
       }
     })
 
@@ -25,13 +28,15 @@ export class RoomService {
   }
 
   async creteRoom(@Body() createRoomDTO: CreateRoomDTO): Promise<Room>{
-    const room = await this.prismaService.room.findUnique({
-      where:{
-        id: createRoomDTO.id
+    if(createRoomDTO.id){
+      const room = await this.prismaService.room.findUnique({
+        where:{
+          id: createRoomDTO.id
+        }
+      })
+      if(room){
+        return room
       }
-    })
-    if(room){
-      return room
     }
     return await this.prismaService.room.create({
       data:{
@@ -46,7 +51,6 @@ export class RoomService {
         id: id
       },
       include:{
-
       }
     });
     if(!room){
@@ -63,16 +67,34 @@ export class RoomService {
     })
   }
 
-  async getRoomByCategory(id: string): Promise<Room[]>{
-    const room = await this.prismaService.room.findMany({
+
+  
+  async deleteRoom(id:string):Promise<any>{
+    const room = await this.prismaService.room.findUnique({
       where:{
-        categoryId: id
+        id:id
+      },
+      include:{
+        imageRoom:true
       }
     })
     if(!room){
-      throw new ForbiddenException('Please Check Again')
+      throw new NotFoundException('Please check again')
     }
-    return room
+    for(let i=0; i<room.imageRoom.length; i++){
+      await this.prismaService.imageRoom.delete({
+        where:{
+          id: room.imageRoom[i].id
+        }
+      })
+    }
+    
+    return await this.prismaService.room.delete({
+      where:{
+        id: id
+      }
+    })
   }
-  
+
+
 }

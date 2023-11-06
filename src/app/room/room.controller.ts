@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { RoomService } from './room.serice';
 import { Room } from '@prisma/client';
 import { CreateRoomDTO } from './dto/create.room.dto';
@@ -24,10 +24,7 @@ export class RoomController {
     return await this.roomService.getAllRoom();
   }
 
-  @Get('get-by-category')
-  async getByCategory(@Query('id') id: string): Promise<Room[]>{
-    return await this.roomService.getRoomByCategory(id);
-  }
+  @Public()
   @Get(':id')
   async getById(@Param('id') roomId: string): Promise<Room | null>{
     return await this.roomService.getRoomById(roomId);
@@ -39,8 +36,13 @@ export class RoomController {
     return await this.roomService.creteRoom(createRoomDTO);
   }
 
-  @Patch()
-  async updateRoom(@Query('id') roomId: string,@Body() updateRoomDto: UpdateRoomDTO): Promise<Room | null>{
+  @Patch(':id')
+  async updateRoom(@Param('id') roomId: string,@Body() updateRoomDto: UpdateRoomDTO): Promise<Room | null>{
     return await this.roomService.updateRoom(roomId, updateRoomDto);
+  }
+
+  @Delete()
+  async deleteRoom(@Query('id') id:string) : Promise<void>{
+    return await this.roomService.deleteRoom(id);
   }
 }

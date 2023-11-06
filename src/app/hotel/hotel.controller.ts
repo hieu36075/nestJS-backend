@@ -12,6 +12,7 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFiles,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -81,6 +82,16 @@ export class HotelController {
     @Query('perPage') perPage:number){
     return await this.hotelService.getHotelByUser(id, page, perPage)
   }
+
+  @Get('/filter-by-user')
+  async filterHotelByUserId(
+    @GetUser('id') id: string, 
+    @Query('active',ParseBoolPipe) active : boolean
+    ){
+    return await this.hotelService.filterHotelByUserId(id, active)
+  }
+
+
   @Public()
   @Get(':id')
   async getById(@Param('id') hotelId: string): Promise<Hotel | null> {
@@ -112,6 +123,11 @@ export class HotelController {
     return await this.hotelService.getReservationsCountByHotel(hotelId);
 
 
+  }
+
+  @Patch('/active-hotel')
+  async activeHotel(@Query('id') id: string):Promise<Hotel|null>{
+    return await this.hotelService.activeHotel(id)
   }
   // @Public()
   // @Get('/get-hotel-by-room')

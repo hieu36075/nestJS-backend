@@ -56,12 +56,39 @@ export class HotelService {
 
     return { data, meta };
   }
+  
+  async activeHotel(hotelId: string): Promise<Hotel |null>{
+    const hotel = await this.prismaService.hotel.findUnique({
+      where:{
+        id:hotelId
+      }
+    })
+    if(!hotel){
+      throw new NotFoundException('Please check again')
+    }
+
+    const update =  await this.prismaService.hotel.update({
+      where:{
+        id: hotelId
+      },
+      data:{
+        isActive: true
+      }
+    })
+    await this.socketGateway.sendNotification(
+      hotel.userId, 
+      'Create hotel succesful, click here to view', 
+      'action_create_hotel', 
+      hotel.id)
+    return update
+  }
 
   async getHotelById(hotelId: string): Promise<Hotel | null> {
     try{
       const hotel = await this.prismaService.hotel.findUnique({
           where: {
-          id: hotelId, // Truyền giá trị của hotelId vào đây
+          id: hotelId, 
+          
         },
         include: {
           images: true,
@@ -117,6 +144,7 @@ export class HotelService {
     const hotel =  await this.prismaService.hotel.create({
       data: {
         ...hotelData,
+        isActive:false,
         amenities: {
           connect: peeksData, // Kết nối với danh sách peeksData
         },
@@ -225,6 +253,25 @@ export class HotelService {
 
     return { data, meta };
   }
+
+  async filterHotelByUserId(id: string, active:boolean) : Promise<Hotel[]>{
+    return await this.prismaService.hotel.findMany({
+      where:{
+        userId:id,
+        isActive: active
+      },
+      include:{
+        rooms:{
+          take:1
+        },
+        images:{
+          take:1
+        }
+      }
+    })
+  }
+
+
   async multiUpload(files: Express.Multer.File[]): Promise<string[]> {
     return this.s3Service.uploadMultipleFiles(files, 'hotels/');
   }
@@ -256,7 +303,6 @@ export class HotelService {
   async getHotelByFilter(getHotelByFilter: GetHotelFilterDTO): Promise<any> {
     try {
       const where = this.buildFilterConditions(getHotelByFilter);
-  
       return await this.prismaService.hotel.findMany({
         where,
         include: {
@@ -299,7 +345,7 @@ export class HotelService {
     try {
       const { name, address, countryId, starRating, categoryId, occupancy, maxPrice, minPrice } = filter;
       const where: any = {};
-  
+      where['isActive'] = true;
       if (name) where['name'] = { contains: name };
       if (address) where['address'] = address;
       if (countryId) where['countryId'] = countryId;

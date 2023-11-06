@@ -11,6 +11,8 @@ import {
   UploadedFile,
   UseInterceptors,
   UploadedFiles,
+  Patch,
+  Param,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDTO } from './dto';
@@ -55,11 +57,17 @@ export class AuthController {
   login(@Body() authDTO: AuthDTO) {
     return this.authService.login(authDTO);
   }
-
+  
+  @Public()
   @Post('login/google')
   async loginByGoogle(@Body('token') token: string): Promise<any> {
     const ticket = await this.authService.verifyGoogleIdToken(token);
     return ticket;
+  }
+
+  @Patch('update-role')
+  async updateRole(@GetUser('id') id:string): Promise<any>{
+    return await this.authService.switchRole(id);
   }
 
   @Public()
@@ -68,6 +76,7 @@ export class AuthController {
   async refreshTokens(@GetUser('id') userId:string , @GetRefreshToken('refreshToken') refreshToken: string) : Promise<Tokens>{
     return await this.authService.refreshTokens(userId, refreshToken) 
   }
+
 
   @Get('mail')
   async sendMail() {

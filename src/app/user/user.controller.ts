@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Query,
   UseGuards,
   UseInterceptors,
@@ -49,6 +50,12 @@ export class UserController {
   @Get(':id')
   async getUser(@Param('id') userId: string): Promise<User>{
     return this.userService.getUserById(userId)
+  }
+
+  @Public()
+  @Patch('band-account/:id')
+  async bandAccount(@Param('id') id: string): Promise<User>{
+    return await this.userService.bandAccount(id);
   }
 
 }

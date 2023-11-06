@@ -72,7 +72,20 @@ export class PaymentService{
               select:{
                 userId:true
               }
+            },
+            orderdetails:{
+              select:{
+                roomId:true
+              }
             }
+          }
+        })
+        await this.prismaService.room.update({
+          where:{
+            id: order.orderdetails[0].roomId
+          },
+          data:{
+            status: 'BOOKED',
           }
         })
         const user = await this.prismaService.profile.findUnique({

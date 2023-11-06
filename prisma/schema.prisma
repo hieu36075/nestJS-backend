@@ -80,7 +80,7 @@ model Message {
 
 model Role {
   id   String @id @default(cuid())
-  name String
+  name String @unique
   user User[]
 }
 
@@ -98,13 +98,13 @@ model Profile {
 
 model Comment {
   id          String         @id @default(cuid())
-  name        String
   description String
   user        User           @relation(fields: [userId], references: [id])
   userId      String
   hohel       Hotel          @relation(fields: [hotelId], references: [id])
   hotelId     String
-  images      ImageComment[]
+  createAt   DateTime        @default(now())
+  updateAt   DateTime        @default(now())
 }
 
 model Category {
@@ -112,7 +112,6 @@ model Category {
   name     String
   imageUrl String?
   hotels   Hotel[]
-  rooms    Room[]
 }
 
 model CategoryRoom {
@@ -179,8 +178,6 @@ model Room {
   name             String
   description      String
   price            Int
-  category         Category       @relation(fields: [categoryId], references: [id])
-  categoryId       String
   hotel            Hotel          @relation(fields: [hotelId], references: [id])
   hotelId          String
   occupancy        Int
@@ -188,8 +185,6 @@ model Room {
   categoryRoom     CategoryRoom   @relation(fields: [categoryRoomId], references: [id])
   categoryRoomId   String
   status           RoomStatus     @default(AVAILABLE)
-  expectedCheckIn  DateTime?
-  expectedCheckOut DateTime?
   area             Int?
   orderDetails     OrderDetails[]
 }
@@ -218,15 +213,7 @@ model ImageRoom {
 
 
 
-model ImageComment {
-  id          String   @id @default(cuid())
-  title       String
-  description String
-  imageUrl    String?
-  date        DateTime
-  comment     Comment  @relation(fields: [commentId], references: [id])
-  commentId   String
-}
+ 
 
 model Order {
   id           String         @id @default(cuid())

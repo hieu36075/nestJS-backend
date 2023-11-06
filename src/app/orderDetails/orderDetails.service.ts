@@ -1,4 +1,4 @@
-import { Body, ForbiddenException, Injectable } from "@nestjs/common";
+import { Body, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { OrderDetails } from "@prisma/client";
 import { PrismaService } from "src/database/prisma/prisma.service";
 import { CreateOrderDetailsDTO } from "./dto/orderDetails.create.dto";
@@ -43,5 +43,35 @@ export class OrderDetailsService{
         }
     }
 
+    async checkDateByRoom(roomId: string) : Promise<OrderDetails[]>{
+        const room = await this.prismaService.room.findUnique({
+            where:{
+                id: roomId
+            }
+        })
 
+        if(!room){
+            throw new NotFoundException("Don't have Id")
+        }
+        
+        return await this.prismaService.orderDetails.findMany({
+            where: {
+              room: {
+                id: roomId
+              },
+              oder:{
+                status: 'DONE'
+              }
+            },
+            include: {
+              oder: {
+                select: {
+                  checkIn: true,
+                  checkOut: true
+                }
+              }
+            }
+          });
+        
+    }
 }

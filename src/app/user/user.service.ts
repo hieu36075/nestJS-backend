@@ -48,11 +48,19 @@ export class UserService {
       where: {
         id: userId,
       },
+      include:{
+        role:{
+          select: {
+            name:true
+          }
+        }
+      }
     });
     if (!user) {
       throw new NotFoundException('Cannot find user with the provided ID');
     }
     delete user.hashedPassword;
+    delete user.hashedRt;
     // this.socketGateway.sendNotification(user.id, 'getUser', 'test 1');
     return user;
   }
@@ -99,5 +107,23 @@ export class UserService {
     };
   }
 
+  async bandAccount(id:string):Promise<User>{
+    const checkId = await this.prismaService.user.findUnique({
+      where:{
+        id:id
+      }
+    })
+    if(!checkId){
+      throw new NotFoundException('Not found id')
+    }
+    return await this.prismaService.user.update({
+      where:{
+        id : id
+      },
+      data:{
+        isActive: false
+      }
+    })
+  }
 
 }

@@ -20,10 +20,6 @@ export class UpdateRoomDTO{
     @ApiProperty({ default: true })
     isAvaiable?: boolean = true;
 
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    categoryId?: string
 
     @IsString()
     @IsNotEmpty()

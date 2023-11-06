@@ -1,10 +1,10 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import * as argon from 'argon2';
 import { AuthDTO } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { MailService } from 'src/providers/mail/mail.service';
 import { S3Service } from 'src/providers/aws s3/aws.s3.service';
 import { createOAuth2Client } from 'src/config/google/oauth2.config';
@@ -220,6 +220,55 @@ export class AuthService {
     return user;
   }
 
+  async switchRole(id: string) :Promise<any>{
+    const user = await this.prismaService.user.findUnique({
+      where:{
+        id: id
+      },
+      include:{
+        role:true
+      }
+    })
+    if(!user){
+      throw new NotFoundException('Please check again')
+    }
+    let newuser : any 
+    if(user.role.name === 'User'){
+      newuser = await this.prismaService.user.update({
+        where:{
+          id: user.id
+        },
+        data:{
+          role:{
+            connect:{
+              id: 'clgywqlp0000408l38j7zarnn'
+            },
+          },
+        },
+        include:{
+          role:true
+        }
+      })
+    }else{
+      newuser = await this.prismaService.user.update({
+        where:{
+          id: user.id
+        },
+        data:{
+          role:{
+            connect:{
+              id: 'clgywq0h8000308l3a38y39t6'
+            },
+          },
+        },
+        include:{
+          role:true
+        }
+      })
+    }
+    
+    return await this.createJwtToken(newuser.id, newuser.email, newuser.role.name)
+  }
   async viewRole(): Promise<Role[]> {
     return await this.prismaService.role.findMany();
   }

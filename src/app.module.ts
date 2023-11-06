@@ -21,7 +21,6 @@ import { RoomModule } from './app/room/room.module';
 import { CityModule } from './app/city/city.module';
 import { CategoryRoomModule } from './app/categoryRoom/categoryRoom.module';
 import { ImageHotelModule } from './app/imageHotel/imageHotel.module';
-import { ImageCommentModule } from './app/imageComment/imageCommmet.module';
 import { ImageRoomModule } from './app/imageRoom/imageRoom.module';
 import { StripeModule } from './providers/stripe/stripe.module';
 import { OrderModule } from './app/order/order.module';
@@ -29,6 +28,7 @@ import { OrderDetailsModule } from './app/orderDetails/orderDetails.module';
 import { PaymentModule } from './app/payment/payment.module';
 import { TaskModule } from './providers/tasks/task.module';
 import { RoomMessageModule } from './app/roomMessage/roomMessage.module';
+import { CommentModule } from './app/comment/comment.module';
 
 @Module({
   imports: [
@@ -63,13 +63,13 @@ import { RoomMessageModule } from './app/roomMessage/roomMessage.module';
     CityModule,
     CategoryRoomModule,
     ImageHotelModule,
-    ImageCommentModule,
     ImageRoomModule,
     PaymentModule,
     StripeModule,
     OrderModule,
     OrderDetailsModule,
-    RoomMessageModule
+    RoomMessageModule,
+    CommentModule
   ],
   controllers: [AppController],
   providers: [AppService],
