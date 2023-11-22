@@ -82,7 +82,7 @@ export class AuthController {
   async sendMail() {
     return this.authService.sendEmail();
   }
-
+  @Public()
   @Post('file-upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {

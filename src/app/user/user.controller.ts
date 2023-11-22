@@ -52,7 +52,7 @@ export class UserController {
     return this.userService.getUserById(userId)
   }
 
-  @Public()
+  @Roles('Admin')
   @Patch('band-account/:id')
   async bandAccount(@Param('id') id: string): Promise<User>{
     return await this.userService.bandAccount(id);

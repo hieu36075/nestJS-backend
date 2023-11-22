@@ -53,11 +53,6 @@ export class CreateHotelDTO{
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    userId: string
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
     cityId: string
 
     @IsNumber()

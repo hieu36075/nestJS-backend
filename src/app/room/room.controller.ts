@@ -30,7 +30,7 @@ export class RoomController {
     return await this.roomService.getRoomById(roomId);
   }
 
-  @Public()
+  @Roles('Hotel Owner')
   @Post()
   async createRoom(@Body() createRoomDTO: CreateRoomDTO): Promise<Room | null>{
     return await this.roomService.creteRoom(createRoomDTO);

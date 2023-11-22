@@ -54,7 +54,7 @@ export class HotelController {
     @Query('countryId') countryId?: string,
     @Query('name') name?: string,
     @Query('categoryId') categoryId?: string,
-    @Query('occupancy') occupancy?: number, // Thêm minOccupancy
+    @Query('occupancy') occupancy?: number, 
     @Query('minPrice') minPrice?: number, 
     @Query('maxPrice') maxPrice?: number, 
   ): Promise<any> {
@@ -74,7 +74,7 @@ export class HotelController {
     return this.hotelService.getHotelByRoomId(hotelId, roomId)
   }
 
-  // @Public()
+  @Roles('User', 'Hotel Owner')
   @Get('/get-by-user')
   async getHotelByUserId(
     @GetUser('id') id: string, 
@@ -97,12 +97,14 @@ export class HotelController {
   async getById(@Param('id') hotelId: string): Promise<Hotel | null> {
     return await this.hotelService.getHotelById(hotelId);
   }
-
+  @Roles('Hotel Owner')
   @Get(':hotelId/users')
   async getUsersForHotel(@Param('hotelId') hotelId: string,  @Query('page') page: number,
   @Query('perPage') perPage: number, ) {
     return this.hotelService.getUsersForHotel(hotelId, page ,perPage);
   }
+
+
   @Public()
   @Get('/get-hotel-by-country/:id')
   async getHotelByCountry(@Param('id') countryId: string): Promise<any> {
@@ -115,6 +117,7 @@ export class HotelController {
     return await this.hotelService.getHotelByCategory(categoryId);
   }
   
+  @Roles('Hotel Owner')
   @Get('/:hotelId/user-in-month')
   async getReservationsCountByHotel(
     @Param('hotelId') hotelId: string,
@@ -125,6 +128,7 @@ export class HotelController {
 
   }
 
+  @Roles('Hotel Owner')
   @Patch('/active-hotel')
   async activeHotel(@Query('id') id: string):Promise<Hotel|null>{
     return await this.hotelService.activeHotel(id)
@@ -136,12 +140,13 @@ export class HotelController {
   // }
   
 
-  @Public()
+  @Roles('Hotel Owner')
   @Post()
-  async createHotel(@Body() craeteHotelDTO: CreateHotelDTO): Promise<Hotel> {
-    return await this.hotelService.createHotel(craeteHotelDTO);
+  async createHotel(@GetUser('id') id: string, @Body() craeteHotelDTO: CreateHotelDTO): Promise<Hotel> {
+    return await this.hotelService.createHotel(id, craeteHotelDTO);
   }
 
+  @Roles('Hotel Owner')
   @Patch()
   async updateHotel(
     @Query('id') hotelId: string,
@@ -150,6 +155,7 @@ export class HotelController {
     return await this.hotelService.updateHotel(hotelId, updateHotelDTO);
   }
 
+  @Roles('User', 'Hotel Owner')
   @Public()
   @Post('/multiple-file-upload')
   @UseInterceptors(FilesInterceptor('files', 5))
@@ -159,7 +165,7 @@ export class HotelController {
     return await this.hotelService.multiUpload(files);
   }
 
-
+  @Roles('Hotel Owner')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete()
   async deleteHotel(@Query('id') hotelId: string): Promise<void> {

@@ -14,7 +14,7 @@ import { UpdateCommentDTO } from "./dto/update.comment.dto";
 @Controller('comment')
 @ApiTags('Comment')
 @ApiBearerAuth('JWT-auth')
-@Roles('User')
+@Roles('User', 'Hotel Owner')
 @UseGuards(MyJwtGuard, RolesGuard)
 @UseInterceptors(CacheInterceptor)
 export class CommentController{

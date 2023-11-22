@@ -23,7 +23,7 @@ import { Roles } from 'src/common/decorator';
 export class NotificationsController {
   constructor(private notificationService: NotificationsService) {}
 
-  @Roles('User')
+  @Roles('User', 'Hotel Owner')
   @Get()
   async getNotificationById(@GetUser('id') id: string) {
     return await this.notificationService.getNotificationById(id);

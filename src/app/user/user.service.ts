@@ -34,7 +34,6 @@ export class UserService {
         },
       },
     });
-    // const sanitizedUsers = users.map(user => Object.assign({}, user, { hashedPassword: undefined }));
     data.forEach((user) => {
       delete user.hashedPassword;
     });
@@ -122,6 +121,13 @@ export class UserService {
       },
       data:{
         isActive: false
+      },
+      include:{
+        role:{
+          select:{
+            name:true
+          }
+        }
       }
     })
   }

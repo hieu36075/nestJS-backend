@@ -129,9 +129,16 @@ export class HotelService {
     }
   }
 
-  async createHotel(@Body() createHotelDTO: CreateHotelDTO): Promise<Hotel> {
+  async createHotel(id:string,  createHotelDTO: CreateHotelDTO): Promise<Hotel> {
     const { peeks, ...hotelData } = createHotelDTO;
-    // Tìm các peek dựa trên danh sách id peek
+    const user = await this.prismaService.user.findUnique({
+      where:{
+        id: id
+      }
+    })
+    if(!user){
+      throw new ForbiddenException('Not Found')
+    }
     const peeksDataPromises = peeks.map(async (peek) => {
       return this.prismaService.amenity.findUnique({
         where: {
@@ -144,6 +151,7 @@ export class HotelService {
     const hotel =  await this.prismaService.hotel.create({
       data: {
         ...hotelData,
+        userId:id,
         isActive:false,
         amenities: {
           connect: peeksData, // Kết nối với danh sách peeksData

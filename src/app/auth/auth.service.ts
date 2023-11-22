@@ -218,6 +218,9 @@ export class AuthService {
       });
       return newUser;
     }
+    if(!user.isActive){
+      throw new ForbiddenException('Please Contact Admin')
+    }
     return user;
   }
 
