@@ -455,4 +455,5 @@ export class HotelService {
 
     return {usersThisMonth, usersLastMonth};
   }
+
 }

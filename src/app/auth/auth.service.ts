@@ -70,6 +70,7 @@ export class AuthService {
     const user = await this.prismaService.user.findUnique({
       where: {
         email: authDTO.email,
+        isActive: true
       },
       include: {
         role: true,
@@ -290,6 +291,12 @@ export class AuthService {
     return this.s3Service.uploadMultipleFiles(files, 'test/');
   }
 
+
+  // async disableAccount(id: string, active : boolean) : Promise<User>{
+  //   return await this.prismaService.user.update({
+
+  //   })
+  // }
   // async forgetPassword(authDTO : AuthDTO)
   // {
   //     const user = await this.prismaService.user.findUnique({

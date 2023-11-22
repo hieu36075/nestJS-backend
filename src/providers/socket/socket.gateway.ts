@@ -83,10 +83,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return await this.socketActionService.getClientByUser(userId)
   }
 
-  // async handleJoinRooom(socket:Socket){
 
-  // }
-  // @UseGuards(WsGuard) 
   @SubscribeMessage('sendNotification')
   async sendNotificationWithClient(client: Socket, payload: any) {
     const { userId, description, action, id } = payload;
@@ -123,11 +120,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   (@MessageBody() message:any,
   @ConnectedSocket() socket: Socket,
   @GetUser() user: any) {
-    // console.log('User:', user);
-    // socket.emit('received_message',{
-    //   message,
-    // }))
-    console.log('abc')
     if(!user.id || !message.userId){
       throw new ForbiddenException('Please check again')
     }
@@ -190,7 +182,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       roomId: roomMessage.id,
       newMessage
     })
-    // socket.broadcast.to(roomMessage.id).emit('message-received', {content: 'chay roi'})
     
   }
   

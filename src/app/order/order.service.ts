@@ -435,4 +435,39 @@ export class OrderService{
     return totalRevenue;
   }
 
+
+  async getMonthlyRevenueByHotelId(hotelId: string, year: number, month: number): Promise<{ month: string, revenue: number }> {
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0);
+
+    const orders = await this.prismaService.order.findMany({
+      where: {
+        hotelId: hotelId,
+        AND: [
+          { checkIn: { gte: startDate } },
+          { checkOut: { lte: endDate } }
+        ]
+      },
+      select: {
+        price: true
+      }
+    });
+
+    const monthlyRevenue = orders.reduce((sum, order) => sum + order.price, 0);
+    return { month: monthNames[month - 1], revenue: monthlyRevenue };
+  }
+
+  async getRevenueData(hotelId: string, startYear: number): Promise<{ month: string, revenue: number }[]> {
+    let revenueData = [];
+
+
+      for (let month = 1; month <= 12; month++) {
+        const monthlyData = await this.getMonthlyRevenueByHotelId(hotelId, startYear, month);
+        revenueData.push(monthlyData);
+      }
+    
+
+    return revenueData;
+  }
 }

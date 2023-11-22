@@ -17,7 +17,7 @@ export class SocketActionService {
       },
     });
     if (existingRecord) {
-      // Nếu record đã tồn tại với một trong hai giá trị, thực hiện cập nhật
+
       const updatedRecord = await this.prismaService.socketConnection.update({
         where: {
           id: existingRecord.id,
@@ -30,7 +30,7 @@ export class SocketActionService {
   
       return updatedRecord;
     } else {
-      // Nếu record không tồn tại, thực hiện tạo mới
+
       const newRecord = await this.prismaService.socketConnection.create({
         data: {
           userId: userId,
@@ -52,11 +52,11 @@ export class SocketActionService {
       });
   
       if (!existingRecord) {
-        // Nếu không tìm thấy bản ghi với socketId cần xóa, không làm gì cả hoặc throw lỗi tùy theo tình huống
-        return null; // hoặc throw new Error('Socket connection not found.');
+
+        return null; 
       }
   
-      // Thực hiện xóa bản ghi nếu tìm thấy
+
       const deletedRecord = await this.prismaService.socketConnection.delete({
         where: {
           id: existingRecord.id,
@@ -117,5 +117,5 @@ export class SocketActionService {
     return notification;
   }
 
-  // ... các phần khác của dịch vụ ...
+
 }

@@ -18,17 +18,17 @@ import { UpdateOrderDTO } from "./dto/order.update.dto";
 @Roles('User')
 @UseGuards(MyJwtGuard, RolesGuard)
 
-export class OrderController{
+export class OrderController {
     constructor(
         private orderService: OrderService
-    ){}
-    
+    ) { }
+
     @Public()
     @Get()
     async getOrder(
         @Query('page') page: number,
         @Query('perPage') perPage: number
-        ) 
+    )
         : Promise<PaginationResult<Order>> {
         return await this.orderService.getOrder(page, perPage);
     }
@@ -37,57 +37,67 @@ export class OrderController{
     // @Public()
     @Get("getByUserId")
     async getOrderByUserId(
-        @GetUser('id') userId: string, 
+        @GetUser('id') userId: string,
         @Query('page') page: number,
-        @Query('perPage') perPage:number): Promise<PaginationResult<Order>>{
+        @Query('perPage') perPage: number): Promise<PaginationResult<Order>> {
         return await this.orderService.getOrderByUser(userId, page, perPage)
     }
-    
+
 
     @Public()
     @Get('order-in-month')
-    async getOrderInMonth() : Promise<{ thisMonth: number; lastMonth: number }>{
+    async getOrderInMonth(): Promise<{ thisMonth: number; lastMonth: number }> {
         return await this.orderService.getTotalOrdersInMonths();
     }
 
     @Public()
     @Get('earnings-in-months')
-    async getEarningInMonths(){
+    async getEarningInMonths() {
         return await this.orderService.getTotalEarningsInMonths();
     }
     @Public()
     @Get('monthly-revenues')
     async getMonthlyRevenuesLast6Months() {
-      const monthlyRevenues = await this.orderService.getMonthlyRevenuesLast6Months();
-      return monthlyRevenues;
+        const monthlyRevenues = await this.orderService.getMonthlyRevenuesLast6Months();
+        return monthlyRevenues;
     }
 
     @Public()
     @Get('total-revenues')
     async getTotalRevenues() {
-      const totalRevenues = await this.orderService.getTotalRevenues();
-      return totalRevenues;
+        const totalRevenues = await this.orderService.getTotalRevenues();
+        return totalRevenues;
     }
 
     @Public()
     @Get(':id')
-    async getOrderById(@Param('id') orderId:string): Promise<Order>{
+    async getOrderById(@Param('id') orderId: string): Promise<Order> {
         return await this.orderService.getOrderById(orderId)
     }
 
     @Post()
-    async createOrder(@GetUser('id') userId:string, @Body() createOrderDTO: CreateOrderDTO): Promise<Order>{
-    //    console.log(createOrderDTO)
+    async createOrder(@GetUser('id') userId: string, @Body() createOrderDTO: CreateOrderDTO): Promise<Order> {
+        //    console.log(createOrderDTO)
         return await this.orderService.createOrder(userId, createOrderDTO);
     }
-    
+
     @Patch()
-    async updateOrder(@Query('id') orderId: string,@Body() updateOrderDTO:UpdateOrderDTO): Promise<Order>{
-        return await this.orderService.updateOrder(orderId,updateOrderDTO);
+    async updateOrder(@Query('id') orderId: string, @Body() updateOrderDTO: UpdateOrderDTO): Promise<Order> {
+        return await this.orderService.updateOrder(orderId, updateOrderDTO);
     }
 
     @Patch('confirm-order/:id')
-    async confirmOrder(@GetUser('id') userId: string, @Param('id') orderId: string): Promise<Order>{
+    async confirmOrder(@GetUser('id') userId: string, @Param('id') orderId: string): Promise<Order> {
         return await this.orderService.confirmOrder(userId, orderId)
+    }
+
+    @Public()
+    @Get('monthly-revenues/:hotelId')
+    async getTotal(
+        @Param('hotelId') hotelId: string,
+        @Query('startYear') startYear: number,
+    ) {
+        const totalRevenue = await this.orderService.getRevenueData(hotelId, startYear);
+        return totalRevenue;
     }
 }

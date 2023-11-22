@@ -17,7 +17,6 @@ export class WsGuard implements CanActivate {
     ): boolean | any | Promise<boolean | any> | Observable<boolean | any> {
         const bearerToken = context.args[0].handshake.headers.authorization.split(' ')[1];
         try {
-      
             const decoded = jwt.verify(bearerToken, this.configService.get('JWT_SECRET')) as any;
             return new Promise(async (resolve, reject) => {
               const user = await this.prismaService.user.findUnique({
