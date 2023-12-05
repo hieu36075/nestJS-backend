@@ -55,6 +55,12 @@ export class OrderController {
     async getEarningInMonths() {
         return await this.orderService.getTotalEarningsInMonths();
     }
+
+    @Public()
+    @Get('earnings-in-months/:id')
+    async getEarningInMonthsByHotel(@Param('id') hotelId: string) {
+        return await this.orderService.getTotalEarningsInMonthsByHotel(hotelId);
+    }
     @Public()
     @Get('monthly-revenues')
     async getMonthlyRevenuesLast6Months() {
@@ -77,7 +83,6 @@ export class OrderController {
 
     @Post()
     async createOrder(@GetUser('id') userId: string, @Body() createOrderDTO: CreateOrderDTO): Promise<Order> {
-        //    console.log(createOrderDTO)
         return await this.orderService.createOrder(userId, createOrderDTO);
     }
 

@@ -23,8 +23,16 @@ export class CategoriesService {
       {
         skip,
         take,
+        include:{
+          hotels:{
+            select:{
+              name:true
+            }
+          }
+        }
       }
     );
+    
 
     const meta = { page, perPage, totalItems, totalPages };
 

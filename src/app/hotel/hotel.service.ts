@@ -73,6 +73,9 @@ export class HotelService {
       },
       data:{
         isActive: true
+      },
+      include:{
+        images:true
       }
     })
     await this.socketGateway.sendNotification(
@@ -199,6 +202,7 @@ export class HotelService {
     return await this.prismaService.hotel.findMany({
       where: {
         countryId: countryId,
+        isActive: true
       },
       include: {
         images: true,
@@ -210,6 +214,7 @@ export class HotelService {
     return await this.prismaService.hotel.findUnique({
       where:{
         id: hotelId,
+        isActive: true,
         rooms:{
           some:{
             id: roomId
@@ -227,6 +232,7 @@ export class HotelService {
     return await this.prismaService.hotel.findMany({
       where: {
         categoryId: categoryId,
+        isActive: true
       },
       include: {
         images: true,
@@ -464,4 +470,27 @@ export class HotelService {
     return {usersThisMonth, usersLastMonth};
   }
 
+
+
+  async bandHotel(id:string):Promise<Hotel>{
+    const checkId = await this.prismaService.hotel.findUnique({
+      where:{
+        id:id
+      }
+    })
+    if(!checkId){
+      throw new NotFoundException('Not found id')
+    }
+    return await this.prismaService.hotel.update({
+      where:{
+        id : id
+      },
+      data:{
+        isActive: false
+      },
+      include:{
+        images:true,
+      }
+    })
+  }
 }

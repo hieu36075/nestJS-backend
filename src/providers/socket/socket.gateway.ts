@@ -102,7 +102,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // @SubscribeMessage('sendNotification')
   async sendNotification(userId: string, description: string,action: string, id: string) {
-    console.log(userId)
     try {
       const socketId = await this.getSocketByUserId(userId);
       if (socketId) {
@@ -191,10 +190,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   (
   @MessageBody() message:any,
   @ConnectedSocket() socket: Socket,
-
   ) {
-    // console.log(socket.request)
-    console.log(message.authencation)
     const token = message.authencation
     let user : any;
     try{
@@ -218,31 +214,57 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       roomId: roomMessage.id,
       newMessage
     })
-    // socket.broadcast.to(roomMessage.id).emit('message-received', {content: 'chay roi'})
-    
   }
-  // try {
-  //   const socketId = await this.getSocketByUserId(userId);
-  //   if (socketId) {
-  //     const notificationData = {
-  //       data: description,
-  //       createdAt: new Date().toISOString(),
-  //       id: cuid(),
-  //       userId: userId,
-  //       type: type
-  //     };
-  //     this.server.to(socketId).emit('notification', notificationData);
 
-  //     await this.socketActionService.createNotification(userId, description, type);
-  //   }
-  // } catch (error) {
-  //   console.error('Error sending notification:', error.message);
-  // }
-  // async sendNotificationForOwner(userId: string, action: string, message: string){
-  //   try {
-  //     const socketId = await this.getSocketByUserId(userId)
-  //   } catch (error) {
-      
-  //   }
-  // }
+  @SubscribeMessage('messageNative')
+  async sendMessageNative
+  (@MessageBody() message:any,
+  @ConnectedSocket() socket: Socket,
+  ) {
+    const token = message.authencation
+    let user : any;
+    try{
+      user = await jwt.verify(token, this.configService.get('JWT_SECRET'))
+    }catch(error){
+      throw new ForbiddenException('please check again')
+    }
+
+    if(!user.id || !message.userId){
+      throw new ForbiddenException('Please check again')
+    }
+    const seederId = await this.getSocketByUserId(user.id);
+    const receivedId = await this.getSocketByUserId(message.userId);
+    let roomId: string;
+    const checkRoom = await this.roomMessageService.checkRoom(user.id, message.userId)
+    if(!checkRoom){
+        const roomMessage = await this.roomMessageService.createRoom();
+        roomId = roomMessage.id
+        await this.userRoomMessageService.create(user.id, roomMessage.id)
+        await this.userRoomMessageService.create(message.userId, roomMessage.id)
+    }else{
+      roomId= checkRoom.id
+    }
+    const newMessage = await this.messageService.createMessage(
+      message.content, 
+      user.id, 
+      roomId
+      );
+    const newRoom = await this.roomMessageService.checkRoomId(roomId)
+    
+    if(!checkRoom){
+      this.server.to(seederId).emit('newRoom-received',{
+        newRoom
+      })
+  
+      this.server.to(receivedId).emit('newRoom-received',{
+        newRoom
+      })
+      return
+    }
+
+    this.server.to(roomId).emit('message-received',{
+      roomId: roomId,
+      newMessage
+    })  
+  }
 }

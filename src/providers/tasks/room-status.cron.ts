@@ -10,7 +10,7 @@ export class RoomStatusCron {
   @Cron(CronExpression.EVERY_HOUR) // You can adjust the schedule based on your needs
   // @Cron('5 * * * * *')
   async handleCron() {
-    console.log('Running room status update task...');
+    // console.log('Running room status update task...');
     await this.roomStatusTask.updateRoomStatus();
   }
 }

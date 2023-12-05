@@ -347,7 +347,7 @@ export class OrderService{
 
     const orders = await this.prismaService.order.findMany({
       where: {
-        status: 'DONE', // Adjust the status according to your needs
+        status: 'DONE', 
         checkIn: {
           gte: sixMonthsAgo,
         },
@@ -397,8 +397,8 @@ export class OrderService{
     const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
 
-    const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1); // Bắt đầu từ ngày 1 tháng này
-  const thisMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Kết thúc vào ngày cuối cùng của tháng
+    const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1); 
+  const thisMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0); 
   
     const [todayRevenue, thisWeekRevenue, lastWeekRevenue, lastMonthRevenue, thisMonthRevenue] = await Promise.all([
       this.calculateRevenueBetween(startOfToday, endOfToday),
@@ -420,7 +420,7 @@ export class OrderService{
   async calculateRevenueBetween(startDate: Date, endDate: Date): Promise<number> {
     const orders = await this.prismaService.order.findMany({
       where: {
-        status: 'DONE', // Adjust the status according to your needs
+        status: 'DONE', 
         checkIn: {
           gte: startDate,
           lt: endDate,
@@ -470,4 +470,74 @@ export class OrderService{
 
     return revenueData;
   }
+
+
+  async getTotalEarningsInMonthsByHotel(hotelId: string): Promise<{ thisMonth: number; lastMonth: number }> {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+
+    const thisMonthStartDate = new Date(currentYear, currentMonth, 1);
+    const thisMonthEndDate = new Date(currentYear, currentMonth + 1, 0);
+
+    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+    const lastMonthStartDate = new Date(lastMonthYear, lastMonth, 1);
+    const lastMonthEndDate = new Date(currentYear, currentMonth, 0);
+
+    const thisMonthDoneOrders = await this.prismaService.order.findMany({
+      where: {
+        hotelId: hotelId,
+        AND: [
+          {
+            checkIn: {
+              gte: thisMonthStartDate,
+            },
+          },
+          {
+            checkOut: {
+              lte: thisMonthEndDate,
+            },
+          },
+          {
+            status: 'DONE',
+          },
+        ],
+      },
+    });
+
+    const lastMonthDoneOrders = await this.prismaService.order.findMany({
+      where: {
+        hotelId:hotelId,
+        AND: [
+          {
+            checkIn: {
+              gte: lastMonthStartDate,
+            },
+          },
+          {
+            checkOut: {
+              lte: lastMonthEndDate,
+            },
+          },
+          {
+            status: 'DONE',
+          },
+        ],
+      },
+    });
+
+    const thisMonthEarnings = thisMonthDoneOrders.reduce(
+      (total, order) => total + order.price,
+      0
+    );
+
+    const lastMonthEarnings = lastMonthDoneOrders.reduce(
+      (total, order) => total + order.price,
+      0
+    );
+
+    return { thisMonth: thisMonthEarnings, lastMonth: lastMonthEarnings };
+}
 }

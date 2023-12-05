@@ -33,6 +33,7 @@ import { Public } from 'src/common/decorator/public.decorator';
 import { Tokens } from './types/token.types';
 import { RtGuard } from 'src/common/guard/rt.guard';
 import { RegisterDTO } from './dto/register.dto';
+import { ResetPasswordDTO } from './dto/resetPassword.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -58,6 +59,11 @@ export class AuthController {
     return this.authService.login(authDTO);
   }
   
+  @Public()
+  @Patch('reset-password')
+  resetPassword(@Body() resetPasswordDTO: ResetPasswordDTO){
+    return this.authService.resetPassword(resetPasswordDTO.email)
+  }
   @Public()
   @Post('login/google')
   async loginByGoogle(@Body('token') token: string): Promise<any> {
@@ -86,6 +92,7 @@ export class AuthController {
   @Post('file-upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file)
     return this.authService.upload(file);
   }
 

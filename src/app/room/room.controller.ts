@@ -40,7 +40,8 @@ export class RoomController {
   async updateRoom(@Param('id') roomId: string,@Body() updateRoomDto: UpdateRoomDTO): Promise<Room | null>{
     return await this.roomService.updateRoom(roomId, updateRoomDto);
   }
-
+  
+  @Roles('Hotel Owner')
   @Delete()
   async deleteRoom(@Query('id') id:string) : Promise<void>{
     return await this.roomService.deleteRoom(id);

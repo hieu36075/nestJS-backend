@@ -82,7 +82,7 @@ export class HotelController {
     @Query('perPage') perPage:number){
     return await this.hotelService.getHotelByUser(id, page, perPage)
   }
-
+  @Roles('Hotel Owner')
   @Get('/filter-by-user')
   async filterHotelByUserId(
     @GetUser('id') id: string, 
@@ -128,7 +128,7 @@ export class HotelController {
 
   }
 
-  @Roles('Hotel Owner')
+  @Roles('Hotel Owner' , 'Admin')
   @Patch('/active-hotel')
   async activeHotel(@Query('id') id: string):Promise<Hotel|null>{
     return await this.hotelService.activeHotel(id)
@@ -170,5 +170,11 @@ export class HotelController {
   @Delete()
   async deleteHotel(@Query('id') hotelId: string): Promise<void> {
     return this.hotelService.deleteHotel(hotelId);
+  }
+
+  @Roles('Admin')
+  @Patch('band-hotel/:id')
+  async bandAccount(@Param('id') id: string): Promise<Hotel>{
+    return await this.hotelService.bandHotel(id);
   }
 }

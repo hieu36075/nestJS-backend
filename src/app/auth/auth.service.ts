@@ -15,6 +15,7 @@ import { Tokens } from './types/token.types';
 import { String } from 'aws-sdk/clients/appstream';
 import { ProfileService } from '../profile/profile.service';
 import { RegisterDTO } from './dto/register.dto';
+import { PasswordDTO } from './dto/password.dto';
 
 
 @Injectable({})
@@ -91,9 +92,7 @@ export class AuthService {
     }
 
     delete user.hashedPassword;
-    // return user
-    // console.log(user)
-    // console.log("test mobile")
+
     const token =  await this.createJwtToken(user.id, user.email, user.role.name);
     await this.updateRtHash(user.id, token.refresh_token)
     return token
@@ -102,7 +101,7 @@ export class AuthService {
   async refreshTokens(userId: string, rt: string): Promise<Tokens> {
     const user = await this.prismaService.user.findUnique({
       where: {
-        id: userId, // Sử dụng kiểu dữ liệu phù hợp: userId là string
+        id: userId,
       },
       include: {
         role: {
@@ -154,10 +153,7 @@ export class AuthService {
       email,
       roles,
     };
-    // const jwtString = await this.jwtService.signAsync(payload, {
-    //   expiresIn: '30m',
-    //   secret: this.configService.get('JWT_SECRET'),
-    // });
+
 
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(payload, {
@@ -281,11 +277,64 @@ export class AuthService {
     return await this.mailService.sendEmail(
       'longqb08122001@gmail.com',
       'hieutcgcd191045@fpt.edu.vn',
-      'Hello Long ngu ',
+      'Hello Long  ',
       'Vào thư rác k ? ',
     );
   }
 
+  async resetPassword(email : string){
+    const randomNumber = Math.floor(Math.random() * 1000000);
+    const randomString = randomNumber.toString().padStart(6, '0');
+    const user = await this.prismaService.user.findUnique({
+      where:{
+        email: email
+      }
+    })
+    
+    if(!user){
+      throw new ForbiddenException('Not Found')
+    }
+    const password = await argon.hash(randomString);
+    await this.prismaService.user.update({
+      where:{
+        email: email
+      },
+      data:{
+        hashedPassword: password
+      }
+    })
+
+    return await this.mailService.sendEmail(
+      `${email}`,
+      'hieutcgcd191045@fpt.edu.vn',
+      'Reset PassWord TravelVietNam',
+      `Your new password is ${randomString}`,
+    );
+  }
+
+  async changePass(id:string, passwordDTO : PasswordDTO){
+    const user = await this.prismaService.user.findUnique({
+      where:{
+        id: id
+      }
+    })
+    
+    const verifyPassword = await argon.verify(
+      user.hashedPassword,
+      passwordDTO.password,
+    );
+    if (!verifyPassword) {
+      throw new ForbiddenException('Wrong Password');
+    }
+    return await this.prismaService.user.update({
+      where:{
+        id: id
+      },
+      data:{
+        hashedPassword: passwordDTO.newPassword
+      },
+    })
+  }
   async upload(file: any) {
     return await this.s3Service.uploadFile(file, 'avatar/a/');
   }
@@ -294,19 +343,8 @@ export class AuthService {
     return this.s3Service.uploadMultipleFiles(files, 'test/');
   }
 
+  
 
-  // async disableAccount(id: string, active : boolean) : Promise<User>{
-  //   return await this.prismaService.user.update({
 
-  //   })
-  // }
-  // async forgetPassword(authDTO : AuthDTO)
-  // {
-  //     const user = await this.prismaService.user.findUnique({
-  //         where:{
-  //             email: authDTO.email
-  //         }
-  //     })
 
-  // }
 }

@@ -25,6 +25,13 @@ export class UserService {
     const skip = (page - 1) * perPage;
     const take = parseInt(String(perPage), 10);
     const data = await this.prismaService.user.findMany({
+      where:{
+        role:{
+          name:{
+            not:'Admin'
+          }
+        }
+      },
       include: {
         profile: true,
         role: {
@@ -131,5 +138,7 @@ export class UserService {
       }
     })
   }
+
+  
 
 }

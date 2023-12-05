@@ -39,7 +39,6 @@ export class ProfileController {
     @GetUser('id') userId: string,
     @Body() updateProfileDTO: UpdateProfileDTO,
   ): Promise<Profile> {
-    console.log(updateProfileDTO);
     return await this.profileService.updateProfile(userId, updateProfileDTO);
   }
 }
