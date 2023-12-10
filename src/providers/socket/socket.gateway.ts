@@ -52,8 +52,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
   async handleDisconnect(socket: Socket) {
     try {
-
-      await this.removeUserSocketInfo(socket.id);
+      // await this.removeUserSocketInfo(socket.id);
       clearInterval(this.pingInterval);
     } catch (error) {
       console.error("Error while removing user socket info:", error);
@@ -123,7 +122,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new ForbiddenException('Please check again')
     }
     const seederId = await this.getSocketByUserId(user.id);
+
     const receivedId = await this.getSocketByUserId(message.userId);
+    
     let roomId: string;
     const checkRoom = await this.roomMessageService.checkRoom(user.id, message.userId)
     if(!checkRoom){

@@ -29,6 +29,7 @@ import { Public } from 'src/common/decorator/public.decorator';
 import { GetHotelFilterDTO } from './dto/getfilter.hotel.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { GetUser } from 'src/common/decorator/user.decorator';
+import { CustomCacheInterceptor } from 'src/common/helpers/customCache.helper';
 
 @Controller('hotel')
 @ApiTags('Hotel')

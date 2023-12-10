@@ -35,7 +35,7 @@ export class RoomController {
   async createRoom(@Body() createRoomDTO: CreateRoomDTO): Promise<Room | null>{
     return await this.roomService.creteRoom(createRoomDTO);
   }
-
+  @Roles('Hotel Owner')
   @Patch(':id')
   async updateRoom(@Param('id') roomId: string,@Body() updateRoomDto: UpdateRoomDTO): Promise<Room | null>{
     return await this.roomService.updateRoom(roomId, updateRoomDto);

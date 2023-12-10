@@ -17,18 +17,12 @@ export class UpdateProfileDTO{
     // @ApiProperty()
     // fullName?: string
 
-    @IsString()
-    @IsNotEmpty()
     @ApiProperty()
     address?: string 
 
-    @IsString()
-    @IsNotEmpty()
     @ApiProperty()
     phoneNumber?: string 
 
-    @IsString()
-    @IsNotEmpty()
     @ApiProperty()
     avatarUrl?: string 
 

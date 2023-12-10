@@ -3,6 +3,7 @@ import { CategoryRoom } from '@prisma/client';
 import { PaginationResult } from 'src/common/interface/pagination.interface';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { CreateCategoryRoomDTO } from './dto/create.categoryRoom.dto';
+import { UpdateCategoryRoomDTO } from './dto/update.categoryRoom.dto';
 
 @Injectable()
 export class CategoryRoomSerive {
@@ -24,17 +25,6 @@ export class CategoryRoomSerive {
     return { data, meta };
   }
 
-  // async getCategoryRoomByHotel(hotelId: string): Promise<CategoryRoom[]>{
-  //   const categoryRoom = await this.prismaService.categoryRoom.findMany({
-  //     where:{
-  //       hotelId: hotelId
-  //     },
-  //     include:{
-  //       rooms: true
-  //     }
-  //   })
-  //   return categoryRoom;
-  // }
   async getByHotelId(id: string, page: number, perPage:number): Promise<PaginationResult<CategoryRoom>>{
     const totalItems = await this.prismaService.hotel.count();
     const totalPages = Math.ceil(totalItems / perPage);
@@ -88,5 +78,34 @@ export class CategoryRoomSerive {
     return room
   }
 
+  async updateCategoryRoom(updateCategoryRoomDTO: UpdateCategoryRoomDTO): Promise<CategoryRoom>{
+    await this.checkId(updateCategoryRoomDTO.id)
+    return await this.prismaService.categoryRoom.update({
+      where:{
+        id: updateCategoryRoomDTO.id
+      },
+      data:{
+        ...updateCategoryRoomDTO
+      },
+      include:{
+        rooms:{
+          include:{
+            imageRoom:true
+          }
+        }
+      }
+    })
+  }
 
+  async checkId(id: string):Promise<{ return: any; }>{
+    const check = await this.prismaService.categoryRoom.findUnique({
+      where:{
+        id: id
+      }
+    })
+    if(!check){
+      throw new ForbiddenException("Don't access recource")
+    }
+    return
+  }
 }

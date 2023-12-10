@@ -31,6 +31,7 @@ export class CountryService {
     const skip = (page - 1) * perPage;
     const take = parseInt(String(perPage), 10);
     const data = await this.prismaService.country.findMany({
+      
       include: {
         hotels: true,
       },

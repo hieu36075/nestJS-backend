@@ -32,6 +32,9 @@ export class HotelService {
     const skip = (page - 1) * perPage;
     const take = parseInt(String(perPage), 10);
     const data = await this.prismaService.hotel.findMany({
+      where:{
+        isActive: true
+      },
       skip,
       take,
       include: {
@@ -324,6 +327,7 @@ export class HotelService {
           rooms:{
             where:{
               status: 'AVAILABLE',
+              ...where.rooms?.some,
             },
             orderBy:{
               price: 'asc'
@@ -365,9 +369,10 @@ export class HotelService {
       if (countryId) where['countryId'] = countryId;
       if (starRating !== undefined) where['starRating'] = starRating;
       if (categoryId ) where['categoryId'] = categoryId;
-      if (occupancy !== undefined || minPrice !== undefined || maxPrice !== undefined) {
+      if (occupancy !== undefined && occupancy > 0 || minPrice !== undefined || maxPrice !== undefined) {
         where['rooms'] = {
-          some: {}
+          some: {
+          }
         };
       
         if (occupancy) {
@@ -384,11 +389,14 @@ export class HotelService {
           if (maxPrice) {
             where['rooms'].some.price.lte = parseInt(String(maxPrice)) ;
           }
+          
         } else {
-          // Nếu một trong hai trống, xóa điều kiện tìm kiếm theo giá
           delete where['rooms'].some.price;
         }
+        
       }
+
+      
       
       return where;
       
@@ -426,7 +434,7 @@ export class HotelService {
       },
       skip,
       take,
-      distinct: ['userId'], // Ensure unique users
+      distinct: ['userId'], 
     });
 
     const user =  usersWithInfo.map((order) => ({
@@ -434,9 +442,9 @@ export class HotelService {
       userId: order.user.id,
       fullName: order.user.profile?.fullName || null,
       email: order.user.email,
-      avatarUrl: order.user.profile?.avatarUrl || null, // Avatar người dùng
-      phoneNumber: order.user.profile?.phoneNumber || null, // Số điện thoại người dùng
-      orderStatus: order.status, // Trạng thái order
+      avatarUrl: order.user.profile?.avatarUrl || null, 
+      phoneNumber: order.user.profile?.phoneNumber || null, 
+      orderStatus: order.status, 
     }))
     const meta = { page, perPage, totalItems, totalPages };
     return {user,meta}

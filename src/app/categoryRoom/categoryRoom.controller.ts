@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CategoryRoomSerive } from './categoryRoom.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorator';
@@ -9,6 +9,7 @@ import { Public } from 'src/common/decorator/public.decorator';
 import { PaginationResult } from 'src/common/interface/pagination.interface';
 import { CategoryRoom } from '@prisma/client';
 import { CreateCategoryRoomDTO } from './dto/create.categoryRoom.dto';
+import { UpdateCategoryRoomDTO } from './dto/update.categoryRoom.dto';
 
 @Controller('categoryRoom')
 @ApiTags('CategoryRoom')
@@ -46,6 +47,12 @@ export class CategoryRoomController {
   @Post()
   async createCategoryRoom(@Body() createCategoryRoomDTO: CreateCategoryRoomDTO){
     return await this.categoryRoomSerivce.createCategoryRoom(createCategoryRoomDTO);
+  }
+
+  @Public()
+  @Patch()
+  async updateCategoryRoom(@Body() updateCategoryRoomDTO: UpdateCategoryRoomDTO){
+    return await this.categoryRoomSerivce.updateCategoryRoom(updateCategoryRoomDTO);
   }
 
   

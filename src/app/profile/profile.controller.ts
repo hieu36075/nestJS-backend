@@ -7,6 +7,7 @@ import { Roles } from 'src/common/decorator';
 import { MyJwtGuard } from 'src/common/guard';
 import { CreateProfileDTO } from './dto/create.profile.dto';
 import { UpdateProfileDTO } from './dto/update.profile.dto';
+import { Public } from 'src/common/decorator/public.decorator';
 
 @Controller('profile')
 @ApiTags('Profile')
@@ -19,7 +20,7 @@ export class ProfileController {
   async getMyProfile(@GetUser('id') userId: string): Promise<Profile> {
     return await this.profileService.getMyProfile(userId);
   }
-
+  @Public()
   @Get(':id')
   async getById(@Param('id') userId: string): Promise<Profile>{
     return await this.profileService.getMyProfile(userId);

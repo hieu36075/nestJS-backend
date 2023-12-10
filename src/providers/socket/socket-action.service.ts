@@ -94,7 +94,6 @@ export class SocketActionService {
           userId: userId,
         },
       })
-
       if(!SocketConnection){
         throw new NotFoundException("Please Check Data Again")
       };

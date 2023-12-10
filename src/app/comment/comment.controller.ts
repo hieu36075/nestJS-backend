@@ -10,6 +10,7 @@ import { Comment } from "@prisma/client";
 import { CreateCommentDTO } from "./dto/create.comment.dto";
 import { GetUser } from "src/common/decorator/user.decorator";
 import { UpdateCommentDTO } from "./dto/update.comment.dto";
+import { Public } from "src/common/decorator/public.decorator";
 
 @Controller('comment')
 @ApiTags('Comment')
@@ -30,6 +31,7 @@ export class CommentController{
         return await this.commentService.getComment(page, perPage)
     }
 
+    @Public()
     @Get('getByHotelId')
     async getByHotelId(
         @Query('id') id: string,
@@ -38,7 +40,7 @@ export class CommentController{
     ): Promise<PaginationResult<Comment>>{
         return await this.commentService.getCommentByHotelId(id, page, perPage)
     }
-
+    @Public()
     @Get(':id/hotel')
     async getAllByHotelId(@Param('id') id: string) : Promise<Comment[]>{
         return await this.commentService.getAllCommentByHotelId(id)
