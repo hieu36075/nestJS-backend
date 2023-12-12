@@ -44,6 +44,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }, 30000);
     socket.on('join', async (userId) => {
       await this.saveUserSocketInfo(userId, socket.id);
+      socket.join(userId); 
     });
 
     socket.on('joinRoom', (roomId) => {
@@ -102,12 +103,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // @SubscribeMessage('sendNotification')
   async sendNotification(userId: string, description: string,action: string, id: string) {
     try {
-      const socketId = await this.getSocketByUserId(userId);
-      if (socketId) {
+      console.log(userId)
+      // const socketId = await this.getSocketByUserId(userId);
+      // if (socketId) {
         const notificationData = await this.socketActionService.createNotification(userId, description, action, id);
-        this.server.to(socketId).emit('notification', notificationData);
-      }
+        this.server.to(userId).emit('notification', notificationData);
+      // }
     } catch (error) {
+      console.log(error)
       console.error('Error sending notification:', error.message);
     }
   }
@@ -197,7 +200,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try{
       user = await jwt.verify(token, this.configService.get('JWT_SECRET'))
     }catch(error){
-      throw new ForbiddenException('please check again')
+      throw new ForbiddenException('please check again 1')
     }
     
     const roomMessage = await this.roomMessageService.checkRoomId(message.roomId)
@@ -227,10 +230,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try{
       user = await jwt.verify(token, this.configService.get('JWT_SECRET'))
     }catch(error){
-      throw new ForbiddenException('please check again')
+      throw new ForbiddenException('please check again 123')
     }
-
+    console.log(user.id)
+    console.log(message)
     if(!user.id || !message.userId){
+      console.log("vv")
       throw new ForbiddenException('Please check again')
     }
     const seederId = await this.getSocketByUserId(user.id);

@@ -15,6 +15,5 @@ export const cities = [
     { name: "Sapa", countryId: "clgywnc7h000008l33v1ja5g9" },
     { name: "Hạ Long", countryId: "clgywnc7h000008l33v1ja5g9" },
     { name: "Quảng Bình", countryId: "clgywnc7h000008l33v1ja5g9" },
-    // Thêm dữ liệu cho các thành phố khác ở đây...
   ];
   

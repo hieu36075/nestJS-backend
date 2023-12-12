@@ -18,8 +18,10 @@ export class ProfileController {
 
   @Get()
   async getMyProfile(@GetUser('id') userId: string): Promise<Profile> {
+    console.log(userId)
     return await this.profileService.getMyProfile(userId);
   }
+  
   @Public()
   @Get(':id')
   async getById(@Param('id') userId: string): Promise<Profile>{

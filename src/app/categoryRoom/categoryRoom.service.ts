@@ -1,5 +1,5 @@
 import { Body, ForbiddenException, Injectable, NotFoundException, Query } from '@nestjs/common';
-import { CategoryRoom } from '@prisma/client';
+import { CategoryRoom, Room } from '@prisma/client';
 import { PaginationResult } from 'src/common/interface/pagination.interface';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { CreateCategoryRoomDTO } from './dto/create.categoryRoom.dto';
@@ -58,6 +58,65 @@ export class CategoryRoomSerive {
 
     return { data, meta };
   }
+
+  async filterAvailableRoomsByHotelIdAndDates(
+    hotelId: string,
+    checkIn: string,
+    checkOut: string,
+  ): Promise<CategoryRoom[]> {
+    const orders = await this.prismaService.order.findMany({
+      where: {
+        hotelId,
+        checkIn: {
+          lte: new Date(checkOut), // Đơn đặt hàng phải kết thúc trước hoặc vào ngày checkOut
+        },
+        checkOut: {
+          gte: new Date(checkIn), // Đơn đặt hàng phải bắt đầu sau hoặc vào ngày checkIn
+        },
+      },
+      include:{
+        orderdetails:true
+      }
+    });
+
+    const bookedRoomIds = orders.map((order) => order.orderdetails[0].roomId);
+    const data = await this.prismaService.categoryRoom.findMany(
+      {
+        where:{
+          hotelId: hotelId
+        },include:{
+          rooms: {
+            where:{
+              NOT:{
+                id:{
+                  in: bookedRoomIds
+                }
+              }
+            },
+            include:{
+              imageRoom: true
+            },
+            
+          }
+        },
+
+      }
+    );
+    // const availableRooms = await this.prismaService.room.findMany({
+    //   where: {
+    //     hotelId,
+    //     NOT: {
+    //       id: {
+    //         in: bookedRoomIds,
+    //       },
+    //     },
+    //   },
+    // });
+
+    return data;
+  }
+
+
   async createCategoryRoom(createCategoryRoomDTO: CreateCategoryRoomDTO): Promise<CategoryRoom >{
       return await this.prismaService.categoryRoom.create({
         data:{

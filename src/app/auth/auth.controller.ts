@@ -34,6 +34,8 @@ import { Tokens } from './types/token.types';
 import { RtGuard } from 'src/common/guard/rt.guard';
 import { RegisterDTO } from './dto/register.dto';
 import { ResetPasswordDTO } from './dto/resetPassword.dto';
+import { PasswordDTO } from './dto/password.dto';
+import { Roles } from 'src/common/decorator';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -81,6 +83,16 @@ export class AuthController {
   @Post('refresh')
   async refreshTokens(@GetUser('id') userId:string , @GetRefreshToken('refreshToken') refreshToken: string) : Promise<Tokens>{
     return await this.authService.refreshTokens(userId, refreshToken) 
+  }
+
+
+  @Roles('User, Hotel Owner')
+  @Post('/change-pass')
+  async changePass(@GetUser('id')id:string, @Body() passwordDTO: PasswordDTO): Promise<any> {
+    await this.authService.changePass(id, passwordDTO);
+    return {
+      message: 'Success'
+    }
   }
 
 

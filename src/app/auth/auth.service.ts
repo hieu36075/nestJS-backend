@@ -202,7 +202,9 @@ export class AuthService {
           roleId: 'clgywq0h8000308l3a38y39t6',
           profile: {
             create: {
-              fullName: 'a',
+              fullName: 'Nguyen A',
+              firstName: 'Nguyen',
+              lastName: 'a',
               avatarUrl: picture,
             },
           },
@@ -325,12 +327,13 @@ export class AuthService {
     if (!verifyPassword) {
       throw new ForbiddenException('Wrong Password');
     }
+    const newPass = await argon.hash(passwordDTO.newPassword);
     return await this.prismaService.user.update({
       where:{
         id: id
       },
       data:{
-        hashedPassword: passwordDTO.newPassword
+        hashedPassword: newPass
       },
     })
   }

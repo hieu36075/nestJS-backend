@@ -58,6 +58,7 @@ export class HotelController {
     @Query('occupancy') occupancy?: number, 
     @Query('minPrice') minPrice?: number, 
     @Query('maxPrice') maxPrice?: number, 
+    @Query('checkIn') checkIn? : string
   ): Promise<any> {
     return await this.hotelService.getHotelByFilter({
       countryId,
@@ -65,7 +66,8 @@ export class HotelController {
       categoryId,
       occupancy,
       minPrice,
-      maxPrice
+      maxPrice,
+      checkIn
     });
   }
 

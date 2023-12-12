@@ -34,4 +34,7 @@ export class GetHotelFilterDTO{
     @Min(1)
     maxPrice?: number;
 
+    @ApiProperty()
+    checkIn?: string;
+
 }

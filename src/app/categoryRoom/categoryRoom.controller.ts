@@ -16,7 +16,7 @@ import { UpdateCategoryRoomDTO } from './dto/update.categoryRoom.dto';
 @ApiBearerAuth('Jwt-auth')
 @Roles('User')
 @UseGuards(MyJwtGuard, RolesGuard)
-@UseInterceptors(CacheInterceptor)
+// @UseInterceptors(CacheInterceptor)
 export class CategoryRoomController {
   constructor(private categoryRoomSerivce: CategoryRoomSerive) {}
 
@@ -54,6 +54,13 @@ export class CategoryRoomController {
   async updateCategoryRoom(@Body() updateCategoryRoomDTO: UpdateCategoryRoomDTO){
     return await this.categoryRoomSerivce.updateCategoryRoom(updateCategoryRoomDTO);
   }
-
-  
+  @Public()
+  @Get(':id/available-rooms')
+  async getAvailableRooms(
+    @Param('id') id: string,
+    @Query('checkIn') checkIn: string,
+    @Query('checkOut') checkOut: string,
+  ) {
+    return this.categoryRoomSerivce.filterAvailableRoomsByHotelIdAndDates(id, checkIn, checkOut);
+  }
 }

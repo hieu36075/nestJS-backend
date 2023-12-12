@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Country, Hotel } from '@prisma/client';
+import { Country, Hotel, OrderStatus } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { CreateHotelDTO } from './dto/create.hotel.dto';
 import { UpdateHotelDTO } from './dto/update.hotel.dto';
@@ -361,7 +361,7 @@ export class HotelService {
 
   private buildFilterConditions(filter: GetHotelFilterDTO) {
     try {
-      const { name, address, countryId, starRating, categoryId, occupancy, maxPrice, minPrice } = filter;
+      const { name, address, countryId, starRating, categoryId, occupancy, maxPrice, minPrice, checkIn } = filter;
       const where: any = {};
       where['isActive'] = true;
       if (name) where['name'] = { contains: name };
@@ -393,7 +393,22 @@ export class HotelService {
         } else {
           delete where['rooms'].some.price;
         }
-        
+        // console.log(checkIn)
+        if (checkIn) {
+          where['rooms'].some.orderDetails = {
+            none: {
+              oder: {
+                    checkIn: {
+                      not:new Date(checkIn)
+                    },
+                    checkOut: {
+                      gte: new Date(checkIn),
+                    },
+                    status: OrderStatus.DONE,
+              },
+            },
+          };
+        }
       }
 
       

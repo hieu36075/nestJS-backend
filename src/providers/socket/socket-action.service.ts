@@ -87,16 +87,17 @@ export class SocketActionService {
     }
   }
 
-  async getClientByUser(userId: string): Promise<SocketConnection["socketId"]>{
+  async getClientByUser(userId: string): Promise<any>{
     try {
-      const SocketConnection =await this.prismaService.socketConnection.findUnique({
+      const SocketConnection = await this.prismaService.socketConnection.findUnique({
         where:{
           userId: userId,
         },
       })
-      if(!SocketConnection){
-        throw new NotFoundException("Please Check Data Again")
-      };
+      console.log(SocketConnection)
+      // if(!SocketConnection){
+      //   throw new NotFoundException("Please Check Data Again")
+      // };
       return SocketConnection.socketId
     } catch (error) {
       throw new Error(error.message)

@@ -14,7 +14,7 @@ import { Public } from 'src/common/decorator/public.decorator';
 @ApiBearerAuth('JWT-auth')
 @Roles('User')
 @UseGuards(MyJwtGuard, RolesGuard)
-@UseInterceptors(CacheInterceptor)
+// @UseInterceptors(CacheInterceptor)
 export class RoomController {
   constructor(private roomService: RoomService) {}
 
